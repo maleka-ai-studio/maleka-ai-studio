@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Maleka AI Studio — Build AI systems that turn attention into booked clients</title>
+<meta name="description" content="Maleka AI Studio builds AI-powered websites, chatbots, voice agents, and automation that turn attention into booked clients for premium service businesses. Book a free AI audit." />
+<meta name="theme-color" content="#07080f" />
+<meta property="og:title" content="Maleka AI Studio — AI systems that turn attention into booked clients" />
+<meta property="og:description" content="AI-powered websites, chatbots, voice agents, lead and booking automation for premium service businesses." />
+<meta property="og:type" content="website" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--bg-page);
+    color: var(--text-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  .icon { width: 18px; height: 18px; stroke-width: 1.75; }
+
+  /* ── A11y helpers ───────────────────────────────────── */
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: 12px; top: -64px; z-index: 100;
+    background: var(--ink-700); color: var(--fg-1);
+    padding: 10px 16px; border-radius: var(--r-sm);
+    border: 1px solid var(--line-glow); font-family: var(--font-body); font-size: var(--fs-sm);
+    transition: top var(--dur) var(--ease-out);
+  }
+  .skip-link:focus { top: 12px; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--cyan-400); outline-offset: 3px;
+  }
+
+  /* ── Ambient page light ─────────────────────────────── */
+  .ambient {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 78% 12%, rgba(61,107,255,0.22), transparent 70%),
+      radial-gradient(48% 44% at 92% 60%, rgba(130,87,255,0.20), transparent 72%),
+      radial-gradient(40% 40% at 60% 78%, rgba(42,216,238,0.10), transparent 75%),
+      var(--ink-850);
+  }
+  .ambient::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 3px 3px; mix-blend-mode: screen; opacity: 0.5;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: var(--container); margin: 0 auto; padding-inline: var(--gutter); }
+
+  /* ── Nav ─────────────────────────────────────────────── */
+  header.nav {
+    position: sticky; top: 0; z-index: 40;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    background: linear-gradient(to bottom, rgba(7,8,15,0.82), rgba(7,8,15,0.35));
+    border-bottom: 1px solid var(--line-1);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-family: var(--font-display); font-weight: 700; color: var(--fg-1); letter-spacing: var(--ls-tight); font-size: 1.05rem; }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 9px; position: relative;
+    background: var(--grad-core); box-shadow: var(--glow-blue);
+    display: grid; place-items: center;
+  }
+  .brand-mark::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px #fff; }
+  .nav-links { display: flex; align-items: center; gap: 30px; font-size: var(--fs-sm); color: var(--fg-3); font-weight: 500; }
+  .nav-links a { transition: color var(--dur-fast); }
+  .nav-links a:hover { color: var(--fg-1); }
+  .nav-cta {
+    font-family: var(--font-body); font-weight: 600; font-size: var(--fs-sm);
+    color: var(--fg-1); padding: 10px 18px; border-radius: var(--r-pill);
+    border: 1px solid var(--line-2); background: rgba(255,255,255,0.03);
+    display: inline-flex; align-items: center; gap: 8px; transition: all var(--dur);
+  }
+  .nav-cta:hover { border-color: var(--line-glow); background: rgba(61,107,255,0.12); }
+
+  /* ── Hero ───────────────────────────────────────────── */
+  .hero { position: relative; padding-top: clamp(40px, 6vw, 80px); padding-bottom: clamp(40px, 6vw, 96px); }
+  .hero-grid {
+    display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(24px, 4vw, 56px); align-items: center; min-height: 640px;
+  }
+
+  /* left copy */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label);
+    text-transform: uppercase; color: var(--fg-2);
+    padding: 7px 14px 7px 11px; border-radius: var(--r-pill);
+    border: 1px solid var(--line-2); background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(8px);
+  }
+  .eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan-400); box-shadow: var(--glow-cyan); animation: dotPulse 2.4s var(--ease-soft) infinite; }
+  h1.headline {
+    font-family: var(--font-display); font-weight: 700; font-size: var(--fs-display);
+    line-height: var(--lh-tight); letter-spacing: var(--ls-display); color: var(--fg-1);
+    margin: 22px 0 0; max-width: 16ch; text-wrap: balance;
+  }
+  h1.headline .glow {
+    background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lead { font-size: var(--fs-lead); line-height: var(--lh-body); color: var(--fg-2); max-width: 46ch; margin: 24px 0 0; }
+  .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 36px; }
+  .btn { font-family: var(--font-body); font-weight: 600; font-size: 0.98rem; border-radius: var(--r-pill); display: inline-flex; align-items: center; gap: 10px; cursor: pointer; transition: all var(--dur) var(--ease-out); border: 1px solid transparent; }
+  .btn-primary {
+    padding: 15px 26px; color: #fff;
+    background: linear-gradient(135deg, var(--blue-500), var(--violet-500));
+    box-shadow: var(--glow-blue), var(--shadow-md), var(--sheen-top);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-violet), var(--shadow-lg), var(--sheen-top); }
+  .btn-ghost { padding: 15px 24px; color: var(--fg-1); border-color: var(--line-2); background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); }
+  .btn-ghost:hover { border-color: var(--line-glow); background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+  .trust-mini { display: flex; align-items: center; gap: 14px; margin-top: 30px; color: var(--fg-3); font-size: var(--fs-sm); }
+  .avatars { display: flex; }
+  .avatars span { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--ink-850); margin-left: -9px; background-size: cover; box-shadow: var(--shadow-sm); }
+  .avatars span:first-child { margin-left: 0; }
+  .stars { color: var(--warning); letter-spacing: 2px; font-size: 0.8rem; }
+
+  /* ── 3D Scene ───────────────────────────────────────── */
+  .scene {
+    position: relative; height: 640px;
+    perspective: 1600px; perspective-origin: 60% 42%;
+  }
+  .stage {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+    transform: rotateX(8deg) rotateY(-18deg);
+    transition: transform 400ms var(--ease-soft);
+    will-change: transform;
+  }
+  .layer { position: absolute; transform-style: preserve-3d; }
+
+  /* core */
+  .core { top: 46%; left: 50%; width: 0; height: 0; transform: translate(-50%,-50%); }
+  .core-halo {
+    position: absolute; left: 50%; top: 50%; width: 440px; height: 440px; transform: translate(-50%,-50%) translateZ(-80px);
+    border-radius: 50%; background: var(--grad-core); filter: blur(34px); opacity: 0.95;
+    animation: breathe 6s var(--ease-soft) infinite;
+  }
+  .core-orb {
+    position: absolute; left: 50%; top: 50%; width: 188px; height: 188px; transform: translate(-50%,-50%) translateZ(30px);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 40% 34%, #ffffff 0%, #b8ecff 16%, var(--cyan-400) 30%, var(--blue-500) 56%, var(--violet-500) 86%, var(--violet-600) 100%);
+    box-shadow: var(--glow-core), 0 0 110px 22px rgba(61,107,255,0.5), 0 0 0 1.5px rgba(186,220,255,0.7), inset 0 0 40px rgba(255,255,255,0.45), inset 0 -22px 46px rgba(40,20,90,0.5);
+  }
+  .core-orb::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle at 36% 30%, rgba(255,255,255,0.9), transparent 32%);
+    mix-blend-mode: screen; animation: shimmer 5s var(--ease-soft) infinite;
+  }
+  .core-core { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; transform: translate(-50%,-50%) translateZ(46px); border-radius: 50%; background: radial-gradient(circle at 42% 38%, #fff, #d6e6ff 60%, #9ec1ff 100%); box-shadow: 0 0 50px 12px #c7dbff, 0 0 110px 26px rgba(61,107,255,0.8); animation: corePulse 3s var(--ease-soft) infinite; }
+
+  /* orbital rings */
+  .ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1px solid var(--line-glow); }
+  .ring.r1 { width: 320px; height: 320px; transform: translate(-50%,-50%) rotateX(70deg) rotateZ(0deg); border-color: rgba(125,156,255,0.55); border-width: 1.5px; box-shadow: 0 0 40px rgba(61,107,255,0.35); animation: spin 16s linear infinite; }
+  .ring.r2 { width: 440px; height: 440px; transform: translate(-50%,-50%) rotateX(68deg) rotateY(14deg); border-color: rgba(130,87,255,0.45); border-style: dashed; animation: spin 26s linear infinite reverse; }
+  .ring.r3 { width: 580px; height: 580px; transform: translate(-50%,-50%) rotateX(72deg) rotateZ(30deg); border-color: rgba(42,216,238,0.28); animation: spin 38s linear infinite; }
+  .ring .node { position: absolute; top: -3px; left: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan-400); box-shadow: var(--glow-cyan); }
+
+  /* floating cards */
+  .card3d {
+    position: absolute;
+    background: linear-gradient(158deg, rgba(36,42,70,0.86), rgba(14,18,32,0.82));
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-float), var(--sheen-top);
+    padding: 13px 15px; color: var(--fg-1);
+    animation: float var(--float-dur, 7s) var(--ease-soft) infinite;
+  }
+  .card3d::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+    background: var(--grad-stroke);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0.5; pointer-events: none;
+  }
+  .c-head { display: flex; align-items: center; gap: 9px; }
+  .c-ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+  .c-ico.blue { background: rgba(61,107,255,0.16); color: var(--blue-400); box-shadow: var(--glow-blue); }
+  .c-ico.violet { background: rgba(130,87,255,0.16); color: var(--violet-400); box-shadow: var(--glow-violet); }
+  .c-ico.cyan { background: rgba(42,216,238,0.14); color: var(--cyan-400); box-shadow: var(--glow-cyan); }
+  .c-ico.green { background: rgba(52,227,164,0.14); color: var(--success); }
+  .c-title { font-weight: 600; font-size: 0.82rem; letter-spacing: -0.01em; line-height: 1.2; }
+  .c-sub { font-size: 0.68rem; color: var(--fg-3); margin-top: 2px; font-family: var(--font-mono); }
+  .c-badge { margin-left: auto; font-size: 0.6rem; font-family: var(--font-mono); padding: 3px 7px; border-radius: var(--r-pill); background: rgba(52,227,164,0.14); color: var(--success); display: inline-flex; align-items: center; gap: 5px; }
+  .c-badge .lvdot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+  /* waveform */
+  .wave { display: flex; align-items: center; gap: 3px; height: 26px; margin-top: 9px; }
+  .wave span { width: 3px; border-radius: 2px; background: linear-gradient(var(--cyan-400), var(--blue-500)); animation: eq 1.1s var(--ease-soft) infinite; }
+  /* mini bars */
+  .bars { display: flex; align-items: flex-end; gap: 5px; height: 34px; margin-top: 10px; }
+  .bars span { width: 9px; border-radius: 3px 3px 0 0; background: linear-gradient(var(--violet-400), var(--blue-600)); opacity: 0.9; }
+  /* calendar mini */
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+  .cal i { width: 12px; height: 12px; border-radius: 3px; background: rgba(255,255,255,0.06); }
+  .cal i.on { background: linear-gradient(135deg, var(--blue-500), var(--violet-500)); box-shadow: 0 0 8px rgba(61,107,255,0.6); }
+
+  /* card placements (each its own depth & drift) */
+  .card-lead   { top: 40px;  left: 18px; width: 226px; transform: translateZ(130px) rotateY(9deg) rotateX(2deg); --float-dur: 7.5s; }
+  .card-booked { top: 6px;  right: 6px; width: 242px; transform: translateZ(64px) rotateY(-11deg); --float-dur: 8.5s; animation-delay: -2s; }
+  .card-chat   { top: 264px; left: 0px; width: 214px; transform: translateZ(104px) rotateY(11deg) rotateX(-2deg); --float-dur: 9s; animation-delay: -1s; }
+  .card-voice  { bottom: 24px; left: 70px; width: 208px; transform: translateZ(150px) rotateY(6deg); --float-dur: 6.8s; animation-delay: -3s; }
+  .card-leads  { bottom: 52px; right: 6px; width: 220px; transform: translateZ(48px) rotateY(-13deg) rotateX(3deg); --float-dur: 8s; animation-delay: -0.6s; }
+  .card-cal    { top: 150px; right: 150px; width: 182px; transform: translateZ(-36px) rotateY(-6deg); opacity: 0.9; --float-dur: 10s; animation-delay: -4s; }
+  .card-reel   { top: 250px; left: 116px; width: 150px; transform: translateZ(-78px) rotateY(13deg) scale(0.92); opacity: 0.78; --float-dur: 11s; animation-delay: -5s; }
+
+  /* ── Section shell ──────────────────────────────────── */
+  section.block { position: relative; z-index: 1; padding-block: var(--section-y); }
+  .sec-eyebrow { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--accent-3); }
+  .sec-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h2); letter-spacing: var(--ls-tight); color: var(--fg-1); margin: 14px 0 0; max-width: 22ch; text-wrap: balance; }
+  .sec-lead { color: var(--fg-3); font-size: var(--fs-lead); margin-top: 14px; max-width: 52ch; line-height: var(--lh-body); }
+
+  /* services grid */
+  .svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
+  .svc {
+    position: relative; border-radius: var(--r-lg); padding: 26px;
+    background: linear-gradient(165deg, rgba(21,24,39,0.7), rgba(10,12,22,0.7));
+    border: 1px solid var(--line-1); transition: all var(--dur) var(--ease-out);
+    overflow: hidden;
+  }
+  .svc::after { content: ""; position: absolute; inset: 0; opacity: 0; background: radial-gradient(120% 80% at 50% -10%, rgba(61,107,255,0.16), transparent 60%); transition: opacity var(--dur); }
+  .svc:hover { transform: translateY(-4px); border-color: var(--line-glow); box-shadow: var(--shadow-lg); }
+  .svc:hover::after { opacity: 1; }
+  .svc .s-ico { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: rgba(61,107,255,0.12); color: var(--blue-400); box-shadow: var(--glow-blue); margin-bottom: 18px; }
+  .svc h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-h3); color: var(--fg-1); margin: 0 0 8px; letter-spacing: -0.01em; }
+  .svc p { margin: 0; font-size: var(--fs-sm); color: var(--fg-3); line-height: var(--lh-body); }
+
+  /* steps */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 48px; }
+  .step { position: relative; padding: 26px; border-radius: var(--r-lg); border: 1px solid var(--line-1); background: rgba(12,14,24,0.5); }
+  .step .num { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-3); letter-spacing: 0.1em; }
+  .step h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; color: var(--fg-1); margin: 12px 0 8px; letter-spacing: -0.01em; }
+  .step p { margin: 0; font-size: var(--fs-sm); color: var(--fg-3); line-height: var(--lh-body); }
+
+  /* work / case studies */
+  .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
+  .case {
+    position: relative; display: flex; flex-direction: column; border-radius: var(--r-lg);
+    border: 1px solid var(--line-1); overflow: hidden;
+    background: linear-gradient(165deg, rgba(21,24,39,0.7), rgba(10,12,22,0.7));
+    transition: transform var(--dur) var(--ease-out), border-color var(--dur), box-shadow var(--dur);
+  }
+  .case:hover { transform: translateY(-4px); border-color: var(--line-glow); box-shadow: var(--shadow-lg); }
+  /* mini dashboard preview */
+  .case-preview {
+    position: relative; height: 168px; padding: 16px; overflow: hidden;
+    border-bottom: 1px solid var(--line-1);
+    background:
+      radial-gradient(80% 90% at 80% 0%, rgba(61,107,255,0.18), transparent 65%),
+      linear-gradient(180deg, rgba(12,15,26,0.6), rgba(7,9,16,0.8));
+  }
+  .case-preview .dash-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .case-preview .dash-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-3); }
+  .case-preview .dash-tag i { width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; }
+  .case-preview .dash-tag .icon { width: 13px; height: 13px; }
+  .dash-live { font-family: var(--font-mono); font-size: 0.54rem; letter-spacing: 0.08em; color: var(--success); display: inline-flex; align-items: center; gap: 5px; }
+  .dash-live .lvdot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); animation: dotPulse 2.4s var(--ease-soft) infinite; }
+
+  /* booking mini-calendar dashboard */
+  .mini-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 16px; }
+  .mini-cal i { aspect-ratio: 1; border-radius: 4px; background: rgba(255,255,255,0.06); }
+  .mini-cal i.on { background: linear-gradient(135deg, var(--blue-500), var(--violet-500)); box-shadow: 0 0 9px rgba(61,107,255,0.55); }
+  .mini-cal i.sel { background: var(--cyan-500); box-shadow: var(--glow-cyan); }
+  .mini-row { display: flex; align-items: center; gap: 8px; margin-top: 13px; }
+  .mini-slot { flex: 1; font-family: var(--font-mono); font-size: 0.58rem; color: var(--fg-2); padding: 6px 8px; border-radius: 7px; border: 1px solid var(--line-1); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: space-between; }
+  .mini-slot.ok { border-color: rgba(52,227,164,0.35); color: var(--success); }
+
+  /* chatbot mini-thread dashboard */
+  .mini-chat { display: flex; flex-direction: column; gap: 7px; margin-top: 16px; }
+  .bub { max-width: 78%; font-size: 0.62rem; line-height: 1.35; padding: 7px 10px; border-radius: 11px; }
+  .bub.in { align-self: flex-start; background: rgba(255,255,255,0.06); color: var(--fg-2); border-bottom-left-radius: 3px; }
+  .bub.out { align-self: flex-end; background: linear-gradient(135deg, var(--blue-600), var(--violet-600)); color: #fff; border-bottom-right-radius: 3px; }
+  .bub.typing { display: inline-flex; gap: 4px; align-items: center; }
+  .bub.typing span { width: 5px; height: 5px; border-radius: 50%; background: var(--fg-3); animation: dotPulse 1.2s var(--ease-soft) infinite; }
+  .bub.typing span:nth-child(2) { animation-delay: 0.2s; }
+  .bub.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* lead automation mini-funnel dashboard */
+  .mini-funnel { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+  .fnl { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 0.58rem; color: var(--fg-3); }
+  .fnl .track { flex: 1; height: 10px; border-radius: var(--r-pill); background: rgba(255,255,255,0.05); overflow: hidden; }
+  .fnl .fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--cyan-500), var(--blue-500), var(--violet-500)); }
+  .fnl .val { width: 30px; text-align: right; color: var(--fg-1); }
+
+  .case-body { padding: 22px; display: flex; flex-direction: column; flex: 1; }
+  .case-body h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-h3); color: var(--fg-1); margin: 0 0 8px; letter-spacing: -0.01em; }
+  .case-body p { margin: 0; font-size: var(--fs-sm); color: var(--fg-3); line-height: var(--lh-body); }
+  .case-result {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-1);
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .case-result .rv { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 1; letter-spacing: var(--ls-tight); background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .case-result .rl { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-3); }
+
+  /* final cta */
+  .cta-card {
+    position: relative; overflow: hidden; border-radius: var(--r-xl); text-align: center;
+    padding: clamp(48px, 7vw, 88px) var(--gutter);
+    background: linear-gradient(165deg, rgba(26,22,64,0.65), rgba(10,12,22,0.8));
+    border: 1px solid var(--line-glow);
+    box-shadow: var(--shadow-lg);
+  }
+  .cta-card::before { content: ""; position: absolute; left: 50%; top: -40%; width: 540px; height: 540px; transform: translateX(-50%); background: var(--grad-core); filter: blur(60px); opacity: 0.5; pointer-events: none; }
+  .cta-card h2 { position: relative; font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h1); color: var(--fg-1); letter-spacing: var(--ls-tight); margin: 0 auto; max-width: 18ch; text-wrap: balance; }
+  .cta-card p { position: relative; color: var(--fg-2); font-size: var(--fs-lead); margin: 18px auto 0; max-width: 46ch; line-height: var(--lh-body); }
+  .cta-card .cta-row { position: relative; justify-content: center; }
+
+  /* booking form */
+  .book-form { position: relative; max-width: 560px; margin: 34px auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: left; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field-full { grid-column: 1 / -1; }
+  .book-form label { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--fg-2); }
+  .book-form label .opt { color: var(--fg-4); }
+  .book-form input, .book-form textarea {
+    font-family: var(--font-body); font-size: var(--fs-sm); color: var(--fg-1);
+    background: rgba(255,255,255,0.04); border: 1px solid var(--line-2); border-radius: var(--r-sm);
+    padding: 12px 14px; width: 100%; transition: border-color var(--dur), box-shadow var(--dur);
+  }
+  .book-form input::placeholder, .book-form textarea::placeholder { color: var(--fg-4); }
+  .book-form input:focus, .book-form textarea:focus { outline: none; border-color: var(--line-glow); box-shadow: 0 0 0 3px rgba(61,107,255,0.18); }
+  .book-form input:user-invalid, .book-form textarea:user-invalid { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(255,93,122,0.16); }
+  .book-form textarea { resize: vertical; min-height: 84px; }
+  .form-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 4px; }
+  .form-status { grid-column: 1 / -1; margin: 2px 0 0; font-size: var(--fs-sm); min-height: 1.3em; text-align: center; }
+  .form-status.ok { color: var(--success); }
+  .form-status.err { color: var(--danger); }
+  @media (max-width: 560px) { .book-form { grid-template-columns: 1fr; } }
+
+  /* footer */
+  footer.ft { position: relative; z-index: 1; border-top: 1px solid var(--line-1); padding-block: 40px; margin-top: var(--section-y); }
+  .ft-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; color: var(--fg-4); font-size: var(--fs-sm); }
+  .ft-links { display: flex; gap: 24px; }
+  .ft-links a:hover { color: var(--fg-2); }
+
+  /* ── Animations ─────────────────────────────────────── */
+  @keyframes float { 0%,100% { translate: 0 0; } 50% { translate: 0 -14px; } }
+  @keyframes spin { to { transform: var(--spin-base, none); } }
+  @keyframes breathe { 0%,100% { opacity: 0.78; transform: translate(-50%,-50%) translateZ(-60px) scale(1); } 50% { opacity: 1; transform: translate(-50%,-50%) translateZ(-60px) scale(1.06); } }
+  @keyframes corePulse { 0%,100% { opacity: 1; transform: translate(-50%,-50%) translateZ(46px) scale(1); } 50% { opacity: 0.78; transform: translate(-50%,-50%) translateZ(46px) scale(0.84); } }
+  @keyframes dotPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  @keyframes shimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+  @keyframes eq { 0%,100% { height: 30%; } 50% { height: 100%; } }
+
+  /* keep ring spin animating around their own tilt */
+  .ring.r1 { animation-name: spinr1; } @keyframes spinr1 { to { transform: translate(-50%,-50%) rotateX(70deg) rotateZ(360deg); } }
+  .ring.r2 { animation-name: spinr2; } @keyframes spinr2 { to { transform: translate(-50%,-50%) rotateX(68deg) rotateY(14deg) rotateZ(360deg); } }
+  .ring.r3 { animation-name: spinr3; } @keyframes spinr3 { to { transform: translate(-50%,-50%) rotateX(72deg) rotateZ(390deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card3d, .core-halo, .core-core, .ring, .wave span, .eyebrow .dot { animation: none !important; }
+  }
+
+  /* ── Responsive ─────────────────────────────────────── */
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+    .scene { height: 520px; order: 2; }
+    .stage { transform: rotateX(6deg) rotateY(-10deg) scale(0.84); }
+    .nav-links { display: none; }
+    .svc-grid, .steps { grid-template-columns: 1fr; }
+    .work-grid { grid-template-columns: 1fr; }
+    h1.headline { max-width: 100%; }
+  }
+  @media (max-width: 560px) {
+    .scene { height: 440px; }
+    .stage { transform: scale(0.62); }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ambient" aria-hidden="true"></div>
+
+<!-- ░░ NAV ░░ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#"><span class="brand-mark" aria-hidden="true"></span>Maleka<span style="color:var(--fg-3);font-weight:500;">AI&nbsp;Studio</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#work">Work</a>
+      <a href="#book">Contact</a>
+    </nav>
+    <a class="nav-cta" href="#book">Book Free AI Audit <i data-lucide="arrow-up-right" class="icon" style="width:16px;height:16px;"></i></a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ░░ HERO ░░ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <!-- left copy -->
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="dot"></span>AI Automation &amp; Creative Studio</span>
+      <h1 class="headline">Build AI systems that turn attention into <span class="glow">booked clients.</span></h1>
+      <p class="lead">AI-powered websites, chatbots, voice agents, automation workflows, and video content systems for premium service businesses.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#book">Book Free AI Audit <i data-lucide="sparkles" class="icon"></i></a>
+        <a class="btn btn-ghost" href="#work">See What I Build <i data-lucide="play" class="icon"></i></a>
+      </div>
+      <div class="trust-mini">
+        <div class="avatars">
+          <span style="background:linear-gradient(135deg,#3d6bff,#8257ff)"></span>
+          <span style="background:linear-gradient(135deg,#2ad8ee,#3d6bff)"></span>
+          <span style="background:linear-gradient(135deg,#8257ff,#ff5d7a)"></span>
+          <span style="background:linear-gradient(135deg,#34e3a4,#2ad8ee)"></span>
+        </div>
+        <div><span class="stars" aria-hidden="true">★★★★★</span><span class="sr-only">Rated 5 out of 5 stars.</span><br><span style="font-size:var(--fs-xs)">Trusted by salons, clinics &amp; premium local brands</span></div>
+      </div>
+    </div>
+
+    <!-- right 3D scene -->
+    <div class="scene" id="scene">
+      <div class="stage" id="stage">
+        <!-- core -->
+        <div class="layer core">
+          <div class="core-halo"></div>
+          <div class="ring r3"><span class="node"></span></div>
+          <div class="ring r2"><span class="node"></span></div>
+          <div class="ring r1"><span class="node"></span></div>
+          <div class="core-orb"></div>
+          <div class="core-core"></div>
+        </div>
+
+        <!-- New lead captured -->
+        <div class="card3d card-lead">
+          <div class="c-head">
+            <div class="c-ico green"><i data-lucide="user-plus" class="icon"></i></div>
+            <div><div class="c-title">New lead captured</div><div class="c-sub">via Instagram DM</div></div>
+            <span class="c-badge"><span class="lvdot"></span>LIVE</span>
+          </div>
+        </div>
+
+        <!-- AI agent booked a consultation -->
+        <div class="card3d card-booked">
+          <div class="c-head">
+            <div class="c-ico blue"><i data-lucide="calendar-check" class="icon"></i></div>
+            <div><div class="c-title">AI agent booked a consultation</div><div class="c-sub">Fri · 2:30 PM · auto-confirmed</div></div>
+          </div>
+        </div>
+
+        <!-- Chatbot replied in 3s -->
+        <div class="card3d card-chat">
+          <div class="c-head">
+            <div class="c-ico violet"><i data-lucide="message-circle" class="icon"></i></div>
+            <div><div class="c-title">Chatbot replied in 3s</div><div class="c-sub">avg response · 24/7</div></div>
+          </div>
+        </div>
+
+        <!-- Voice waveform -->
+        <div class="card3d card-voice">
+          <div class="c-head">
+            <div class="c-ico cyan"><i data-lucide="mic" class="icon"></i></div>
+            <div><div class="c-title">Voice agent</div><div class="c-sub">handling inbound call</div></div>
+          </div>
+          <div class="wave" id="wave"></div>
+        </div>
+
+        <!-- Leads overview -->
+        <div class="card3d card-leads">
+          <div class="c-head">
+            <div class="c-ico blue"><i data-lucide="trending-up" class="icon"></i></div>
+            <div><div class="c-title">Leads overview</div><div class="c-sub">+38% this week</div></div>
+          </div>
+          <div class="bars">
+            <span style="height:38%"></span><span style="height:55%"></span><span style="height:46%"></span>
+            <span style="height:72%"></span><span style="height:64%"></span><span style="height:90%"></span><span style="height:100%"></span>
+          </div>
+        </div>
+
+        <!-- Booking calendar -->
+        <div class="card3d card-cal">
+          <div class="c-head">
+            <div class="c-ico violet"><i data-lucide="calendar-days" class="icon"></i></div>
+            <div><div class="c-title">Booking calendar</div></div>
+          </div>
+          <div class="cal">
+            <i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i>
+            <i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i>
+          </div>
+        </div>
+
+        <!-- Reel concept generated -->
+        <div class="card3d card-reel">
+          <div class="c-head">
+            <div class="c-ico cyan"><i data-lucide="clapperboard" class="icon"></i></div>
+            <div><div class="c-title">Reel concept</div><div class="c-sub">generated</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ SERVICES ░░ -->
+<section class="block" id="services">
+  <div class="wrap">
+    <span class="sec-eyebrow">What I build</span>
+    <h2 class="sec-title">A complete AI system behind every booking.</h2>
+    <p class="sec-lead">Each piece works on its own — together they capture attention, answer instantly, and convert it into confirmed appointments.</p>
+    <div class="svc-grid">
+      <div class="svc"><div class="s-ico"><i data-lucide="layout-template" class="icon"></i></div><h3>AI-powered websites</h3><p>Cinematic, conversion-built sites that load fast and turn visitors into booked clients.</p></div>
+      <div class="svc"><div class="s-ico"><i data-lucide="message-square-text" class="icon"></i></div><h3>Chatbots</h3><p>On-brand assistants that answer in seconds, qualify leads, and never miss a DM.</p></div>
+      <div class="svc"><div class="s-ico"><i data-lucide="phone-call" class="icon"></i></div><h3>Voice agents</h3><p>Natural-sounding AI that picks up every call and books straight into your calendar.</p></div>
+      <div class="svc"><div class="s-ico"><i data-lucide="clapperboard" class="icon"></i></div><h3>AI video &amp; reels</h3><p>Always-on content systems that script, generate, and schedule short-form video.</p></div>
+      <div class="svc"><div class="s-ico"><i data-lucide="workflow" class="icon"></i></div><h3>Lead automation</h3><p>Capture, route, and follow up automatically — every lead nurtured without lifting a finger.</p></div>
+      <div class="svc"><div class="s-ico"><i data-lucide="calendar-clock" class="icon"></i></div><h3>Booking automation</h3><p>Confirmations, reminders, and reschedules handled end-to-end, around the clock.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ PROCESS ░░ -->
+<section class="block" id="process">
+  <div class="wrap">
+    <span class="sec-eyebrow">How the audit works</span>
+    <h2 class="sec-title">From free audit to a system that runs itself.</h2>
+    <div class="steps">
+      <div class="step"><div class="num">01</div><h3>Free AI audit</h3><p>We map where leads slip away and pinpoint the highest-leverage automations for your business.</p></div>
+      <div class="step"><div class="num">02</div><h3>Custom build</h3><p>I design and wire your AI stack — site, chat, voice, content, and booking — tailored to your brand.</p></div>
+      <div class="step"><div class="num">03</div><h3>Launch &amp; optimize</h3><p>Go live, watch the bookings land, and refine continuously as the system learns.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ WORK / CASE STUDIES ░░ -->
+<section class="block" id="work">
+  <div class="wrap">
+    <span class="sec-eyebrow">Work · case studies</span>
+    <h2 class="sec-title">AI systems already turning attention into bookings.</h2>
+    <p class="sec-lead">A look at three systems I've built — each running quietly in the background, capturing leads and filling calendars around the clock.</p>
+    <div class="work-grid">
+
+      <!-- AI Booking System -->
+      <article class="case">
+        <div class="case-preview">
+          <div class="dash-head">
+            <span class="dash-tag"><i class="c-ico blue"><i data-lucide="calendar-days" class="icon"></i></i>Booking</span>
+            <span class="dash-live"><span class="lvdot"></span>LIVE</span>
+          </div>
+          <div class="mini-cal">
+            <i></i><i class="on"></i><i></i><i class="sel"></i><i class="on"></i><i></i><i class="on"></i>
+            <i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i>
+          </div>
+          <div class="mini-row">
+            <span class="mini-slot ok">Fri 2:30 PM <span>confirmed</span></span>
+            <span class="mini-slot">Sat 11:00 <span>open</span></span>
+          </div>
+        </div>
+        <div class="case-body">
+          <h3>AI Booking System</h3>
+          <p>An AI agent that books, confirms, reminds, and reschedules straight into the calendar — no back-and-forth, no missed slots, 24/7.</p>
+          <div class="case-result">
+            <span class="rv">+62%</span><span class="rl">booked appointments</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Website Chatbot System -->
+      <article class="case">
+        <div class="case-preview">
+          <div class="dash-head">
+            <span class="dash-tag"><i class="c-ico violet"><i data-lucide="message-circle" class="icon"></i></i>Chatbot</span>
+            <span class="dash-live"><span class="lvdot"></span>ONLINE</span>
+          </div>
+          <div class="mini-chat">
+            <span class="bub in">Do you have any openings this week?</span>
+            <span class="bub out">Yes — Friday 2:30 PM is free. Want me to book it?</span>
+            <span class="bub typing"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+        <div class="case-body">
+          <h3>Website Chatbot System</h3>
+          <p>An on-brand assistant that answers instantly, qualifies every visitor, and hands warm leads straight to the booking flow.</p>
+          <div class="case-result">
+            <span class="rv">3s</span><span class="rl">avg reply time</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Lead Automation System -->
+      <article class="case">
+        <div class="case-preview">
+          <div class="dash-head">
+            <span class="dash-tag"><i class="c-ico cyan"><i data-lucide="workflow" class="icon"></i></i>Leads</span>
+            <span class="dash-live"><span class="lvdot"></span>RUNNING</span>
+          </div>
+          <div class="mini-funnel">
+            <div class="fnl">Captured<span class="track"><span class="fill" style="width:100%"></span></span><span class="val">420</span></div>
+            <div class="fnl">Qualified<span class="track"><span class="fill" style="width:74%"></span></span><span class="val">312</span></div>
+            <div class="fnl">Booked<span class="track"><span class="fill" style="width:46%"></span></span><span class="val">193</span></div>
+          </div>
+        </div>
+        <div class="case-body">
+          <h3>Lead Automation System</h3>
+          <p>Every lead captured, scored, and followed up automatically across DMs, forms, and ads — nurtured without lifting a finger.</p>
+          <div class="case-result">
+            <span class="rv">+38%</span><span class="rl">leads converted</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ░░ FINAL CTA ░░ -->
+<section class="block" id="book">
+  <div class="wrap">
+    <div class="cta-card">
+      <h2>Let's turn your attention into booked clients.</h2>
+      <p>Book a free AI audit and I'll show you exactly where automation will move the needle.</p>
+
+      <form class="book-form" id="bookForm" novalidate>
+        <div class="field">
+          <label for="bf-name">Your name</label>
+          <input id="bf-name" name="name" type="text" autocomplete="name" required placeholder="Jordan Rivera" />
+        </div>
+        <div class="field">
+          <label for="bf-business">Business name</label>
+          <input id="bf-business" name="business" type="text" autocomplete="organization" required placeholder="Velvet Studio" />
+        </div>
+        <div class="field field-full">
+          <label for="bf-email">Email</label>
+          <input id="bf-email" name="email" type="email" autocomplete="email" required placeholder="you@business.com" />
+        </div>
+        <div class="field field-full">
+          <label for="bf-goal">What do you want to automate? <span class="opt">(optional)</span></label>
+          <textarea id="bf-goal" name="goal" rows="3" placeholder="Bookings, DMs, follow-ups…"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Book Free AI Audit <i data-lucide="sparkles" class="icon" aria-hidden="true"></i></button>
+          <a class="btn btn-ghost" href="#work">See What I Build <i data-lucide="arrow-up-right" class="icon" aria-hidden="true"></i></a>
+        </div>
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ░░ FOOTER ░░ -->
+<footer class="ft">
+  <div class="wrap ft-inner">
+    <a class="brand" href="#" style="font-size:0.95rem;"><span class="brand-mark" style="width:24px;height:24px;" aria-hidden="true"></span>Maleka AI Studio</a>
+    <nav class="ft-links" aria-label="Footer">
+      <a href="#services">Services</a><a href="#process">Process</a><a href="#book">Book Audit</a>
+    </nav>
+    <span>© 2026 Maleka AI Studio</span>
+  </div>
+</footer>
+
+<script>
+  // icons
+  lucide.createIcons();
+  // mark all generated icons as decorative for assistive tech
+  document.querySelectorAll('svg.lucide').forEach((el) => {
+    el.setAttribute('aria-hidden', 'true');
+    el.setAttribute('focusable', 'false');
+  });
+
+  // booking form — client-side validation + confirmation
+  const bookForm = document.getElementById('bookForm');
+  const formStatus = document.getElementById('formStatus');
+  if (bookForm) {
+    bookForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!bookForm.checkValidity()) {
+        formStatus.textContent = 'Please add your name, business, and a valid email.';
+        formStatus.className = 'form-status err';
+        bookForm.reportValidity();
+        return;
+      }
+      // TODO: wire to a real endpoint (Formspree, a /api route, or your CRM) before launch.
+      formStatus.textContent = "Thanks — your audit request is in. I'll be in touch within 24 hours.";
+      formStatus.className = 'form-status ok';
+      bookForm.reset();
+    });
+  }
+
+  // build waveform bars
+  const wave = document.getElementById('wave');
+  if (wave) {
+    const hs = [40,70,52,90,60,100,46,76,58,84,50,68,44,80,56];
+    hs.forEach((h,i) => { const s = document.createElement('span'); s.style.height = h+'%'; s.style.animationDelay = (-i*0.08)+'s'; wave.appendChild(s); });
+  }
+
+  // subtle mouse parallax on the 3D stage
+  const scene = document.getElementById('scene');
+  const stage = document.getElementById('stage');
+  if (scene && stage && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let tx = -18, ty = 8, cx = -18, cy = 8;
+    scene.addEventListener('mousemove', (e) => {
+      const r = scene.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      tx = -18 + px * 14; ty = 8 - py * 12;
+    });
+    scene.addEventListener('mouseleave', () => { tx = -18; ty = 8; });
+    (function loop(){ cx += (tx-cx)*0.06; cy += (ty-cy)*0.06; stage.style.transform = `rotateX(${cy}deg) rotateY(${cx}deg)`; requestAnimationFrame(loop); })();
+  }
+</script>
+</body>
+</html>

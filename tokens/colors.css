@@ -1,0 +1,58 @@
+/* ── Maleka AI Studio · Color System ───────────────────────────
+   Premium dark / futuristic. Electric blue + violet + cyan accents
+   on a near-black, blue-shifted ground. ───────────────────────── */
+
+:root {
+  /* ░░ Ground — near-black, blue-shifted ░░ */
+  --ink-900: #04050a;   /* deepest void */
+  --ink-850: #07080f;   /* page background */
+  --ink-800: #0a0c16;   /* raised surface */
+  --ink-750: #0f111d;   /* card base */
+  --ink-700: #151827;   /* elevated card */
+  --ink-650: #1c2032;   /* hairline fills */
+
+  /* ░░ Text ░░ */
+  --fg-1: #f4f6ff;      /* primary, near-white w/ cool cast */
+  --fg-2: #c3c8e0;      /* secondary */
+  --fg-3: #8b91b4;      /* muted / captions */
+  --fg-4: #5a6088;      /* faint / disabled */
+
+  /* ░░ Brand accents ░░ */
+  --blue-400: #6f9bff;
+  --blue-500: #3d6bff;  /* electric blue — primary */
+  --blue-600: #2a4fe0;
+  --violet-400: #a98bff;
+  --violet-500: #8257ff; /* violet — secondary */
+  --violet-600: #6a3fe6;
+  --cyan-400: #5ff0ff;
+  --cyan-500: #2ad8ee;  /* subtle cyan — tertiary glow */
+
+  /* ░░ Signature gradient ░░ */
+  --grad-core: radial-gradient(circle at 50% 40%, var(--cyan-400) 0%, var(--blue-500) 38%, var(--violet-600) 78%, transparent 100%);
+  --grad-stroke: linear-gradient(135deg, var(--cyan-400), var(--blue-500) 45%, var(--violet-500));
+  --grad-text: linear-gradient(100deg, #ffffff 0%, #cdd6ff 40%, var(--blue-400) 100%);
+
+  /* ░░ Semantic ░░ */
+  --success: #34e3a4;
+  --warning: #ffc24b;
+  --danger: #ff5d7a;
+
+  /* ░░ Lines & glass ░░ */
+  --line-1: rgba(255,255,255,0.08);   /* default hairline */
+  --line-2: rgba(255,255,255,0.14);   /* stronger border */
+  --line-glow: rgba(125,156,255,0.35);/* lit edge */
+  --glass-fill: rgba(18,22,38,0.55);  /* frosted panel */
+  --glass-fill-hi: rgba(30,36,60,0.62);
+
+  /* ░░ Semantic aliases ░░ */
+  --bg-page: var(--ink-850);
+  --bg-elevated: var(--ink-750);
+  --surface-card: var(--glass-fill);
+  --text-heading: var(--fg-1);
+  --text-body: var(--fg-2);
+  --text-muted: var(--fg-3);
+  --accent: var(--blue-500);
+  --accent-2: var(--violet-500);
+  --accent-3: var(--cyan-500);
+  --border: var(--line-1);
+}

@@ -1,0 +1,9 @@
+/* ── Maleka AI Studio · Webfonts ───────────────────────────────
+   NOTE: No brand font binaries were provided. These are Google Fonts
+   substitutions chosen to match the premium-futuristic direction:
+     · Sora        → geometric display (headlines, brand)
+     · Manrope     → humanist body (UI + prose)
+     · JetBrains Mono → technical / data labels
+   Swap in licensed brand fonts when available. ─────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');

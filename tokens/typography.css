@@ -1,0 +1,35 @@
+/* ── Maleka AI Studio · Typography ─────────────────────────────── */
+
+:root {
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Type scale — fluid where it matters */
+  --fs-display: clamp(2.8rem, 5.2vw, 4.6rem); /* @kind font */  /* hero headline */
+  --fs-h1: clamp(2.1rem, 3.4vw, 3rem); /* @kind font */
+  --fs-h2: clamp(1.6rem, 2.4vw, 2.1rem); /* @kind font */
+  --fs-h3: 1.35rem; /* @kind font */
+  --fs-lead: clamp(1.05rem, 1.4vw, 1.25rem); /* @kind font */  /* hero supporting */
+  --fs-body: 1rem; /* @kind font */
+  --fs-sm: 0.875rem; /* @kind font */
+  --fs-xs: 0.78rem; /* @kind font */
+  --fs-label: 0.72rem; /* @kind font */  /* eyebrow / mono labels */
+
+  /* Weights */
+  --fw-regular: 400; /* @kind font */
+  --fw-medium: 500; /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-bold: 700; /* @kind font */
+  --fw-extra: 800; /* @kind font */
+
+  /* Line heights */
+  --lh-tight: 1.04; /* @kind font */
+  --lh-snug: 1.18; /* @kind font */
+  --lh-body: 1.6; /* @kind font */
+
+  /* Tracking */
+  --ls-tight: -0.02em; /* @kind font */
+  --ls-display: -0.03em; /* @kind font */
+  --ls-label: 0.22em; /* @kind font */  /* eyebrows, uppercase mono */
+}

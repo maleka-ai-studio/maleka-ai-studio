@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Vercel
+.vercel
+
+# Logs / deps (none required for this static site, but safe to ignore)
+node_modules/
+*.log
