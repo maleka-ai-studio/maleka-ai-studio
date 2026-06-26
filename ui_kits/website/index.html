@@ -713,5 +713,11 @@
     (function loop(){ cx += (tx-cx)*0.06; cy += (ty-cy)*0.06; stage.style.transform = `rotateX(${cy}deg) rotateY(${cx}deg)`; requestAnimationFrame(loop); })();
   }
 </script>
+
+<!-- ░░ ELEVENLABS VOICE & CHAT WIDGET ░░ -->
+<!-- Floating assistant, fixed bottom-right on every page. Renders in its own
+     layer, so it does not affect the page layout or the 3D hero. -->
+<elevenlabs-convai agent-id="agent_8901kw2616bmf3t9wesxz08wajys"></elevenlabs-convai>
+<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 </body>
 </html>
