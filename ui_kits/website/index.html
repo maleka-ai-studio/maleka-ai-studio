@@ -42,13 +42,15 @@
     outline: 2px solid var(--cyan-400); outline-offset: 3px;
   }
 
-  /* ── Ambient page light ─────────────────────────────── */
+  /* ── Fixed cinematic background stack ────────────────── */
+  /* order back→front: ambient color → starfield canvas → mouse glow */
   .ambient {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background:
       radial-gradient(60% 50% at 78% 12%, rgba(61,107,255,0.22), transparent 70%),
       radial-gradient(48% 44% at 92% 60%, rgba(130,87,255,0.20), transparent 72%),
       radial-gradient(40% 40% at 60% 78%, rgba(42,216,238,0.10), transparent 75%),
+      radial-gradient(46% 40% at 8% 84%, rgba(255,93,158,0.10), transparent 76%),
       var(--ink-850);
   }
   .ambient::after {
@@ -56,8 +58,32 @@
     background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
     background-size: 3px 3px; mix-blend-mode: screen; opacity: 0.5;
   }
+  /* animated aurora light beams sweeping across the page */
+  .beams { position: fixed; inset: -20% 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: 0.5; }
+  .beams span {
+    position: absolute; left: -40%; width: 180%; height: 220px; border-radius: 50%;
+    filter: blur(60px); opacity: 0.5; mix-blend-mode: screen;
+    background: var(--grad-aurora);
+    animation: beamDrift 26s var(--ease-soft) infinite;
+  }
+  .beams span:nth-child(1) { top: 8%;  transform: rotate(-8deg); animation-duration: 30s; }
+  .beams span:nth-child(2) { top: 46%; transform: rotate(6deg);  animation-duration: 38s; animation-delay: -12s; opacity: 0.4; }
+  .beams span:nth-child(3) { top: 78%; transform: rotate(-4deg); animation-duration: 34s; animation-delay: -6s; opacity: 0.35; }
+
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; mix-blend-mode: screen; }
+  #cursorGlow {
+    position: fixed; z-index: 0; top: 0; left: 0; width: 640px; height: 640px;
+    margin: -320px 0 0 -320px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(61,107,255,0.16), rgba(130,87,255,0.08) 40%, transparent 68%);
+    mix-blend-mode: screen; opacity: 0; transition: opacity 500ms var(--ease-soft);
+    will-change: transform;
+  }
 
   .wrap { position: relative; z-index: 1; max-width: var(--container); margin: 0 auto; padding-inline: var(--gutter); }
+
+  /* ── Scroll reveal ──────────────────────────────────── */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out); }
+  .reveal.in { opacity: 1; transform: none; }
 
   /* ── Nav ─────────────────────────────────────────────── */
   header.nav {
@@ -71,19 +97,21 @@
   .brand-mark {
     width: 30px; height: 30px; border-radius: 9px; position: relative;
     background: var(--grad-core); box-shadow: var(--glow-blue);
-    display: grid; place-items: center;
+    display: grid; place-items: center; animation: markSpin 12s linear infinite;
   }
   .brand-mark::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px #fff; }
   .nav-links { display: flex; align-items: center; gap: 30px; font-size: var(--fs-sm); color: var(--fg-3); font-weight: 500; }
-  .nav-links a { transition: color var(--dur-fast); }
+  .nav-links a { position: relative; transition: color var(--dur-fast); }
+  .nav-links a::after { content: ""; position: absolute; left: 0; bottom: -6px; height: 1.5px; width: 0; background: var(--grad-stroke); transition: width var(--dur) var(--ease-out); }
   .nav-links a:hover { color: var(--fg-1); }
+  .nav-links a:hover::after { width: 100%; }
   .nav-cta {
     font-family: var(--font-body); font-weight: 600; font-size: var(--fs-sm);
     color: var(--fg-1); padding: 10px 18px; border-radius: var(--r-pill);
     border: 1px solid var(--line-2); background: rgba(255,255,255,0.03);
     display: inline-flex; align-items: center; gap: 8px; transition: all var(--dur);
   }
-  .nav-cta:hover { border-color: var(--line-glow); background: rgba(61,107,255,0.12); }
+  .nav-cta:hover { border-color: var(--line-glow); background: rgba(61,107,255,0.12); box-shadow: var(--glow-blue); }
 
   /* ── Hero ───────────────────────────────────────────── */
   .hero { position: relative; padding-top: clamp(40px, 6vw, 80px); padding-bottom: clamp(40px, 6vw, 96px); }
@@ -109,16 +137,20 @@
   }
   h1.headline .glow {
     background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent;
+    background-size: 200% auto; animation: textShine 7s linear infinite;
   }
   .lead { font-size: var(--fs-lead); line-height: var(--lh-body); color: var(--fg-2); max-width: 46ch; margin: 24px 0 0; }
   .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 36px; }
-  .btn { font-family: var(--font-body); font-weight: 600; font-size: 0.98rem; border-radius: var(--r-pill); display: inline-flex; align-items: center; gap: 10px; cursor: pointer; transition: all var(--dur) var(--ease-out); border: 1px solid transparent; }
+  .btn { position: relative; font-family: var(--font-body); font-weight: 600; font-size: 0.98rem; border-radius: var(--r-pill); display: inline-flex; align-items: center; gap: 10px; cursor: pointer; transition: all var(--dur) var(--ease-out); border: 1px solid transparent; overflow: hidden; }
   .btn-primary {
     padding: 15px 26px; color: #fff;
     background: linear-gradient(135deg, var(--blue-500), var(--violet-500));
     box-shadow: var(--glow-blue), var(--shadow-md), var(--sheen-top);
   }
+  /* sweeping sheen on primary CTA */
+  .btn-primary::after { content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent); transform: skewX(-18deg); transition: left 0.7s var(--ease-out); }
   .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-violet), var(--shadow-lg), var(--sheen-top); }
+  .btn-primary:hover::after { left: 130%; }
   .btn-ghost { padding: 15px 24px; color: var(--fg-1); border-color: var(--line-2); background: rgba(255,255,255,0.03); backdrop-filter: blur(8px); }
   .btn-ghost:hover { border-color: var(--line-glow); background: rgba(255,255,255,0.06); transform: translateY(-2px); }
   .trust-mini { display: flex; align-items: center; gap: 14px; margin-top: 30px; color: var(--fg-3); font-size: var(--fs-sm); }
@@ -143,6 +175,15 @@
 
   /* core */
   .core { top: 46%; left: 50%; width: 0; height: 0; transform: translate(-50%,-50%); }
+  /* rotating volumetric light rays behind the orb */
+  .core-rays {
+    position: absolute; left: 50%; top: 50%; width: 620px; height: 620px;
+    transform: translate(-50%,-50%) translateZ(-90px); border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, rgba(95,240,255,0.14) 0deg 2deg, transparent 2deg 13deg, rgba(130,87,255,0.12) 13deg 15deg, transparent 15deg 26deg);
+    -webkit-mask: radial-gradient(circle, transparent 26%, #000 44%, transparent 72%);
+    mask: radial-gradient(circle, transparent 26%, #000 44%, transparent 72%);
+    opacity: 0.55; animation: raysSpin 44s linear infinite; mix-blend-mode: screen;
+  }
   .core-halo {
     position: absolute; left: 50%; top: 50%; width: 440px; height: 440px; transform: translate(-50%,-50%) translateZ(-80px);
     border-radius: 50%; background: var(--grad-core); filter: blur(34px); opacity: 0.95;
@@ -167,7 +208,10 @@
   .ring.r1 { width: 320px; height: 320px; transform: translate(-50%,-50%) rotateX(70deg) rotateZ(0deg); border-color: rgba(125,156,255,0.55); border-width: 1.5px; box-shadow: 0 0 40px rgba(61,107,255,0.35); animation: spin 16s linear infinite; }
   .ring.r2 { width: 440px; height: 440px; transform: translate(-50%,-50%) rotateX(68deg) rotateY(14deg); border-color: rgba(130,87,255,0.45); border-style: dashed; animation: spin 26s linear infinite reverse; }
   .ring.r3 { width: 580px; height: 580px; transform: translate(-50%,-50%) rotateX(72deg) rotateZ(30deg); border-color: rgba(42,216,238,0.28); animation: spin 38s linear infinite; }
+  .ring.r4 { width: 700px; height: 700px; transform: translate(-50%,-50%) rotateX(74deg) rotateY(-10deg); border-color: rgba(255,93,158,0.20); border-style: dotted; animation: spin 52s linear infinite reverse; }
   .ring .node { position: absolute; top: -3px; left: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan-400); box-shadow: var(--glow-cyan); }
+  .ring.r2 .node { background: var(--violet-400); box-shadow: var(--glow-violet); }
+  .ring.r4 .node { background: var(--pink-400); box-shadow: var(--glow-pink); }
 
   /* floating cards */
   .card3d {
@@ -177,6 +221,7 @@
     border-radius: var(--r-md);
     box-shadow: var(--shadow-float), var(--sheen-top);
     padding: 13px 15px; color: var(--fg-1);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     animation: float var(--float-dur, 7s) var(--ease-soft) infinite;
   }
   .card3d::before {
@@ -223,37 +268,69 @@
   .sec-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h2); letter-spacing: var(--ls-tight); color: var(--fg-1); margin: 14px 0 0; max-width: 22ch; text-wrap: balance; }
   .sec-lead { color: var(--fg-3); font-size: var(--fs-lead); margin-top: 14px; max-width: 52ch; line-height: var(--lh-body); }
 
-  /* services grid */
+  /* thin holographic divider grid line at section tops */
+  .grid-rule { position: relative; height: 1px; background: linear-gradient(90deg, transparent, var(--line-2), transparent); margin-bottom: 4px; overflow: visible; }
+  .grid-rule::after { content: ""; position: absolute; top: -1px; left: 0; width: 90px; height: 3px; border-radius: 3px; background: var(--grad-beam); filter: blur(1px); animation: railRun 6s var(--ease-soft) infinite; }
+
+  /* services grid — glassmorphism */
   .svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
   .svc {
     position: relative; border-radius: var(--r-lg); padding: 26px;
-    background: linear-gradient(165deg, rgba(21,24,39,0.7), rgba(10,12,22,0.7));
-    border: 1px solid var(--line-1); transition: all var(--dur) var(--ease-out);
-    overflow: hidden;
+    background: linear-gradient(165deg, rgba(21,24,39,0.55), rgba(10,12,22,0.55));
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--line-1); transition: transform var(--dur) var(--ease-out), border-color var(--dur), box-shadow var(--dur);
+    overflow: hidden; transform-style: preserve-3d;
   }
-  .svc::after { content: ""; position: absolute; inset: 0; opacity: 0; background: radial-gradient(120% 80% at 50% -10%, rgba(61,107,255,0.16), transparent 60%); transition: opacity var(--dur); }
+  /* neon border on hover */
+  .svc::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: var(--grad-stroke); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity var(--dur); pointer-events: none; }
+  .svc::after { content: ""; position: absolute; inset: 0; opacity: 0; background: radial-gradient(120% 80% at var(--mx,50%) var(--my,-10%), rgba(61,107,255,0.18), transparent 60%); transition: opacity var(--dur); pointer-events: none; }
   .svc:hover { transform: translateY(-4px); border-color: var(--line-glow); box-shadow: var(--shadow-lg); }
+  .svc:hover::before { opacity: 0.9; }
   .svc:hover::after { opacity: 1; }
-  .svc .s-ico { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: rgba(61,107,255,0.12); color: var(--blue-400); box-shadow: var(--glow-blue); margin-bottom: 18px; }
+  .svc .s-ico { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: rgba(61,107,255,0.12); color: var(--blue-400); box-shadow: var(--glow-blue); margin-bottom: 18px; transition: transform var(--dur) var(--ease-out); }
+  .svc:hover .s-ico { transform: translateZ(30px) scale(1.06); }
   .svc h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-h3); color: var(--fg-1); margin: 0 0 8px; letter-spacing: -0.01em; }
   .svc p { margin: 0; font-size: var(--fs-sm); color: var(--fg-3); line-height: var(--lh-body); }
+  .svc-2 .s-ico { background: rgba(130,87,255,0.12); color: var(--violet-400); box-shadow: var(--glow-violet); }
+  .svc-3 .s-ico { background: rgba(42,216,238,0.12); color: var(--cyan-400); box-shadow: var(--glow-cyan); }
+  .svc-4 .s-ico { background: rgba(255,93,158,0.12); color: var(--pink-400); box-shadow: var(--glow-pink); }
+  .svc-5 .s-ico { background: rgba(61,107,255,0.12); color: var(--blue-400); box-shadow: var(--glow-blue); }
+  .svc-6 .s-ico { background: rgba(130,87,255,0.12); color: var(--violet-400); box-shadow: var(--glow-violet); }
 
-  /* steps */
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 48px; }
-  .step { position: relative; padding: 26px; border-radius: var(--r-lg); border: 1px solid var(--line-1); background: rgba(12,14,24,0.5); }
+  /* ── Process — glowing AI pipeline ──────────────────── */
+  .pipeline { position: relative; margin-top: 54px; }
+  /* animated connecting line running through the steps */
+  .pipe-line { position: absolute; top: 34px; left: 6%; right: 6%; height: 2px; background: linear-gradient(90deg, transparent, var(--line-2) 12%, var(--line-2) 88%, transparent); overflow: visible; z-index: 0; }
+  .pipe-line::after { content: ""; position: absolute; top: -1px; left: 0; width: 22%; height: 4px; border-radius: 4px; background: var(--grad-beam); filter: blur(1px); animation: pipeRun 5.5s var(--ease-soft) infinite; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; position: relative; z-index: 1; }
+  .step { position: relative; padding: 30px 22px 24px; border-radius: var(--r-lg); border: 1px solid var(--line-1); background: linear-gradient(165deg, rgba(16,19,32,0.72), rgba(9,11,20,0.72)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: transform var(--dur) var(--ease-out), border-color var(--dur), box-shadow var(--dur); }
+  .step:hover { transform: translateY(-4px); border-color: var(--line-glow); box-shadow: var(--shadow-lg); }
+  .step .node-dot { position: absolute; top: -9px; left: 26px; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff, var(--blue-400) 60%, var(--violet-600)); box-shadow: var(--glow-blue), 0 0 18px rgba(61,107,255,0.7); }
+  .step .node-dot::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid var(--line-glow); animation: nodePing 3s var(--ease-soft) infinite; }
+  .step:nth-child(2) .node-dot { background: radial-gradient(circle at 40% 35%, #fff, var(--cyan-400) 60%, var(--blue-500)); box-shadow: var(--glow-cyan); }
+  .step:nth-child(3) .node-dot { background: radial-gradient(circle at 40% 35%, #fff, var(--violet-400) 60%, var(--violet-600)); box-shadow: var(--glow-violet); }
+  .step:nth-child(4) .node-dot { background: radial-gradient(circle at 40% 35%, #fff, var(--pink-400) 60%, var(--pink-500)); box-shadow: var(--glow-pink); }
   .step .num { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-3); letter-spacing: 0.1em; }
-  .step h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; color: var(--fg-1); margin: 12px 0 8px; letter-spacing: -0.01em; }
+  .step .s-ic { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; margin: 14px 0 4px; background: rgba(61,107,255,0.12); color: var(--blue-400); box-shadow: var(--glow-blue); }
+  .step:nth-child(2) .s-ic { background: rgba(42,216,238,0.12); color: var(--cyan-400); box-shadow: var(--glow-cyan); }
+  .step:nth-child(3) .s-ic { background: rgba(130,87,255,0.12); color: var(--violet-400); box-shadow: var(--glow-violet); }
+  .step:nth-child(4) .s-ic { background: rgba(255,93,158,0.12); color: var(--pink-400); box-shadow: var(--glow-pink); }
+  .step h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.12rem; color: var(--fg-1); margin: 12px 0 8px; letter-spacing: -0.01em; }
   .step p { margin: 0; font-size: var(--fs-sm); color: var(--fg-3); line-height: var(--lh-body); }
 
-  /* work / case studies */
+  /* ── Featured systems / what I build ────────────────── */
   .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
   .case {
     position: relative; display: flex; flex-direction: column; border-radius: var(--r-lg);
     border: 1px solid var(--line-1); overflow: hidden;
-    background: linear-gradient(165deg, rgba(21,24,39,0.7), rgba(10,12,22,0.7));
+    background: linear-gradient(165deg, rgba(21,24,39,0.6), rgba(10,12,22,0.6));
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     transition: transform var(--dur) var(--ease-out), border-color var(--dur), box-shadow var(--dur);
+    transform-style: preserve-3d;
   }
+  .case::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: var(--grad-stroke); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity var(--dur); pointer-events: none; z-index: 3; }
   .case:hover { transform: translateY(-4px); border-color: var(--line-glow); box-shadow: var(--shadow-lg); }
+  .case:hover::before { opacity: 0.9; }
   /* mini dashboard preview */
   .case-preview {
     position: relative; height: 168px; padding: 16px; overflow: hidden;
@@ -293,7 +370,25 @@
   .fnl { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 0.58rem; color: var(--fg-3); }
   .fnl .track { flex: 1; height: 10px; border-radius: var(--r-pill); background: rgba(255,255,255,0.05); overflow: hidden; }
   .fnl .fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--cyan-500), var(--blue-500), var(--violet-500)); }
-  .fnl .val { width: 30px; text-align: right; color: var(--fg-1); }
+  .fnl .val { width: 34px; text-align: right; color: var(--fg-1); }
+
+  /* voice agent mini-waveform dashboard */
+  .mini-wave { display: flex; align-items: center; gap: 4px; height: 60px; margin-top: 20px; padding: 0 2px; }
+  .mini-wave span { flex: 1; border-radius: 3px; background: linear-gradient(var(--cyan-400), var(--blue-500)); box-shadow: 0 0 8px rgba(42,216,238,0.4); animation: eq 1.2s var(--ease-soft) infinite; }
+  .mini-caption { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; font-family: var(--font-mono); font-size: 0.58rem; color: var(--fg-3); }
+  .mini-caption .dur { color: var(--cyan-400); }
+
+  /* reels / content workflow mini dashboard */
+  .mini-reels { display: flex; gap: 8px; margin-top: 18px; }
+  .reel-frame { position: relative; flex: 1; aspect-ratio: 9/13; border-radius: 8px; overflow: hidden; border: 1px solid var(--line-1); background: linear-gradient(160deg, rgba(130,87,255,0.35), rgba(61,107,255,0.2)); }
+  .reel-frame:nth-child(2) { background: linear-gradient(160deg, rgba(42,216,238,0.3), rgba(61,107,255,0.22)); }
+  .reel-frame:nth-child(3) { background: linear-gradient(160deg, rgba(255,93,158,0.32), rgba(130,87,255,0.24)); }
+  .reel-frame .play { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; opacity: 0.9; }
+  .reel-frame .play .icon { width: 16px; height: 16px; }
+  .reel-frame .barline { position: absolute; left: 6px; right: 6px; bottom: 6px; height: 3px; border-radius: 3px; background: rgba(255,255,255,0.25); overflow: hidden; }
+  .reel-frame .barline i { position: absolute; inset: 0; width: 40%; border-radius: 3px; background: #fff; animation: reelPlay 3.4s var(--ease-soft) infinite; }
+  .reel-frame:nth-child(2) .barline i { animation-delay: -1.1s; width: 65%; }
+  .reel-frame:nth-child(3) .barline i { animation-delay: -2.2s; width: 25%; }
 
   .case-body { padding: 22px; display: flex; flex-direction: column; flex: 1; }
   .case-body h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-h3); color: var(--fg-1); margin: 0 0 8px; letter-spacing: -0.01em; }
@@ -305,6 +400,18 @@
   .case-result .rv { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 1; letter-spacing: var(--ls-tight); background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .case-result .rl { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-3); }
 
+  /* ── Why AI automation matters — vortex band ────────── */
+  .why { position: relative; overflow: hidden; }
+  #vortex { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+  .why .wrap { position: relative; z-index: 1; }
+  .why-head { max-width: 620px; }
+  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 50px; }
+  .why-card { position: relative; padding: 26px 22px; border-radius: var(--r-lg); border: 1px solid var(--line-1); background: linear-gradient(165deg, rgba(16,19,32,0.62), rgba(9,11,20,0.55)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: transform var(--dur) var(--ease-out), border-color var(--dur), box-shadow var(--dur); }
+  .why-card:hover { transform: translateY(-4px); border-color: var(--line-glow); box-shadow: var(--shadow-lg); }
+  .why-card .wv { font-family: var(--font-display); font-weight: 700; font-size: 2.1rem; line-height: 1; letter-spacing: var(--ls-tight); background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .why-card .wt { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; color: var(--fg-1); margin: 14px 0 6px; }
+  .why-card p { margin: 0; font-size: var(--fs-sm); color: var(--fg-3); line-height: var(--lh-body); }
+
   /* final cta */
   .cta-card {
     position: relative; overflow: hidden; border-radius: var(--r-xl); text-align: center;
@@ -313,7 +420,7 @@
     border: 1px solid var(--line-glow);
     box-shadow: var(--shadow-lg);
   }
-  .cta-card::before { content: ""; position: absolute; left: 50%; top: -40%; width: 540px; height: 540px; transform: translateX(-50%); background: var(--grad-core); filter: blur(60px); opacity: 0.5; pointer-events: none; }
+  .cta-card::before { content: ""; position: absolute; left: 50%; top: -40%; width: 540px; height: 540px; transform: translateX(-50%); background: var(--grad-core); filter: blur(60px); opacity: 0.5; pointer-events: none; animation: breathe 7s var(--ease-soft) infinite; }
   .cta-card h2 { position: relative; font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h1); color: var(--fg-1); letter-spacing: var(--ls-tight); margin: 0 auto; max-width: 18ch; text-wrap: balance; }
   .cta-card p { position: relative; color: var(--fg-2); font-size: var(--fs-lead); margin: 18px auto 0; max-width: 46ch; line-height: var(--lh-body); }
   .cta-card .cta-row { position: relative; justify-content: center; }
@@ -353,25 +460,49 @@
   @keyframes dotPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
   @keyframes shimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
   @keyframes eq { 0%,100% { height: 30%; } 50% { height: 100%; } }
+  @keyframes raysSpin { to { transform: translate(-50%,-50%) translateZ(-90px) rotate(360deg); } }
+  @keyframes markSpin { to { transform: rotate(360deg); } }
+  @keyframes textShine { to { background-position: 200% center; } }
+  @keyframes beamDrift { 0%,100% { transform: translateX(-6%) rotate(-8deg); } 50% { transform: translateX(6%) rotate(-4deg); } }
+  @keyframes railRun { 0% { left: -12%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+  @keyframes pipeRun { 0% { left: -22%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+  @keyframes nodePing { 0% { opacity: 0.9; transform: scale(1); } 70%,100% { opacity: 0; transform: scale(1.8); } }
+  @keyframes reelPlay { 0% { left: -40%; } 100% { left: 100%; } }
 
   /* keep ring spin animating around their own tilt */
   .ring.r1 { animation-name: spinr1; } @keyframes spinr1 { to { transform: translate(-50%,-50%) rotateX(70deg) rotateZ(360deg); } }
   .ring.r2 { animation-name: spinr2; } @keyframes spinr2 { to { transform: translate(-50%,-50%) rotateX(68deg) rotateY(14deg) rotateZ(360deg); } }
   .ring.r3 { animation-name: spinr3; } @keyframes spinr3 { to { transform: translate(-50%,-50%) rotateX(72deg) rotateZ(390deg); } }
+  .ring.r4 { animation-name: spinr4; } @keyframes spinr4 { to { transform: translate(-50%,-50%) rotateX(74deg) rotateY(-10deg) rotateZ(-360deg); } }
 
   @media (prefers-reduced-motion: reduce) {
-    .card3d, .core-halo, .core-core, .ring, .wave span, .eyebrow .dot { animation: none !important; }
+    html { scroll-behavior: auto; }
+    .card3d, .core-halo, .core-core, .core-rays, .ring, .wave span, .mini-wave span, .eyebrow .dot,
+    .beams span, .brand-mark, h1.headline .glow, .grid-rule::after, .pipe-line::after,
+    .step .node-dot::after, .reel-frame .barline i, .cta-card::before, .dash-live .lvdot {
+      animation: none !important;
+    }
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   }
 
   /* ── Responsive ─────────────────────────────────────── */
+  @media (max-width: 1020px) {
+    .svc-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: repeat(2, 1fr); }
+    .pipe-line { display: none; }
+    .why-grid { grid-template-columns: repeat(2, 1fr); }
+    .work-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 980px) {
     .hero-grid { grid-template-columns: 1fr; gap: 24px; }
     .scene { height: 520px; order: 2; }
     .stage { transform: rotateX(6deg) rotateY(-10deg) scale(0.84); }
     .nav-links { display: none; }
-    .svc-grid, .steps { grid-template-columns: 1fr; }
-    .work-grid { grid-template-columns: 1fr; }
     h1.headline { max-width: 100%; }
+  }
+  @media (max-width: 680px) {
+    .svc-grid, .steps, .why-grid, .work-grid { grid-template-columns: 1fr; }
+    .beams { opacity: 0.32; }
   }
   @media (max-width: 560px) {
     .scene { height: 440px; }
@@ -382,6 +513,9 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="ambient" aria-hidden="true"></div>
+<div class="beams" aria-hidden="true"><span></span><span></span><span></span></div>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div id="cursorGlow" aria-hidden="true"></div>
 
 <!-- ░░ NAV ░░ -->
 <header class="nav">
@@ -391,6 +525,7 @@
       <a href="#services">Services</a>
       <a href="#process">Process</a>
       <a href="#work">Work</a>
+      <a href="#why">Why AI</a>
       <a href="#book">Contact</a>
     </nav>
     <a class="nav-cta" href="#book">Book Free AI Audit <i data-lucide="arrow-up-right" class="icon" style="width:16px;height:16px;"></i></a>
@@ -427,7 +562,9 @@
       <div class="stage" id="stage">
         <!-- core -->
         <div class="layer core">
+          <div class="core-rays"></div>
           <div class="core-halo"></div>
+          <div class="ring r4"><span class="node"></span></div>
           <div class="ring r3"><span class="node"></span></div>
           <div class="ring r2"><span class="node"></span></div>
           <div class="ring r1"><span class="node"></span></div>
@@ -481,11 +618,11 @@
           </div>
         </div>
 
-        <!-- Booking calendar -->
+        <!-- Booking request collected -->
         <div class="card3d card-cal">
           <div class="c-head">
             <div class="c-ico violet"><i data-lucide="calendar-days" class="icon"></i></div>
-            <div><div class="c-title">Booking calendar</div></div>
+            <div><div class="c-title">Booking request collected</div></div>
           </div>
           <div class="cal">
             <i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i>
@@ -508,16 +645,17 @@
 <!-- ░░ SERVICES ░░ -->
 <section class="block" id="services">
   <div class="wrap">
-    <span class="sec-eyebrow">What I build</span>
-    <h2 class="sec-title">A complete AI system behind every booking.</h2>
-    <p class="sec-lead">Each piece works on its own — together they capture attention, answer instantly, and convert it into confirmed appointments.</p>
+    <div class="grid-rule reveal" aria-hidden="true"></div>
+    <span class="sec-eyebrow reveal">What I build</span>
+    <h2 class="sec-title reveal">A complete AI system behind every booking.</h2>
+    <p class="sec-lead reveal">Each piece works on its own — together they capture attention, answer instantly, and convert it into confirmed appointments.</p>
     <div class="svc-grid">
-      <div class="svc"><div class="s-ico"><i data-lucide="layout-template" class="icon"></i></div><h3>AI-powered websites</h3><p>Cinematic, conversion-built sites that load fast and turn visitors into booked clients.</p></div>
-      <div class="svc"><div class="s-ico"><i data-lucide="message-square-text" class="icon"></i></div><h3>Chatbots</h3><p>On-brand assistants that answer in seconds, qualify leads, and never miss a DM.</p></div>
-      <div class="svc"><div class="s-ico"><i data-lucide="phone-call" class="icon"></i></div><h3>Voice agents</h3><p>Natural-sounding AI that picks up every call and books straight into your calendar.</p></div>
-      <div class="svc"><div class="s-ico"><i data-lucide="clapperboard" class="icon"></i></div><h3>AI video &amp; reels</h3><p>Always-on content systems that script, generate, and schedule short-form video.</p></div>
-      <div class="svc"><div class="s-ico"><i data-lucide="workflow" class="icon"></i></div><h3>Lead automation</h3><p>Capture, route, and follow up automatically — every lead nurtured without lifting a finger.</p></div>
-      <div class="svc"><div class="s-ico"><i data-lucide="calendar-clock" class="icon"></i></div><h3>Booking automation</h3><p>Confirmations, reminders, and reschedules handled end-to-end, around the clock.</p></div>
+      <div class="svc svc-1 tilt reveal"><div class="s-ico"><i data-lucide="layout-template" class="icon"></i></div><h3>AI-powered websites</h3><p>Cinematic, conversion-built sites that load fast and turn visitors into booked clients.</p></div>
+      <div class="svc svc-2 tilt reveal"><div class="s-ico"><i data-lucide="message-square-text" class="icon"></i></div><h3>Chatbots</h3><p>On-brand assistants that answer in seconds, qualify leads, and never miss a DM.</p></div>
+      <div class="svc svc-3 tilt reveal"><div class="s-ico"><i data-lucide="phone-call" class="icon"></i></div><h3>Voice agents</h3><p>Natural-sounding AI that picks up every call and books straight into your calendar.</p></div>
+      <div class="svc svc-4 tilt reveal"><div class="s-ico"><i data-lucide="clapperboard" class="icon"></i></div><h3>AI video &amp; reels</h3><p>Always-on content systems that script, generate, and schedule short-form video.</p></div>
+      <div class="svc svc-5 tilt reveal"><div class="s-ico"><i data-lucide="workflow" class="icon"></i></div><h3>Lead automation</h3><p>Capture, route, and follow up automatically — every lead nurtured without lifting a finger.</p></div>
+      <div class="svc svc-6 tilt reveal"><div class="s-ico"><i data-lucide="calendar-clock" class="icon"></i></div><h3>Booking automation</h3><p>Confirmations, reminders, and reschedules handled end-to-end, around the clock.</p></div>
     </div>
   </div>
 </section>
@@ -525,26 +663,142 @@
 <!-- ░░ PROCESS ░░ -->
 <section class="block" id="process">
   <div class="wrap">
-    <span class="sec-eyebrow">How the audit works</span>
-    <h2 class="sec-title">From free audit to a system that runs itself.</h2>
-    <div class="steps">
-      <div class="step"><div class="num">01</div><h3>Free AI audit</h3><p>We map where leads slip away and pinpoint the highest-leverage automations for your business.</p></div>
-      <div class="step"><div class="num">02</div><h3>Custom build</h3><p>I design and wire your AI stack — site, chat, voice, content, and booking — tailored to your brand.</p></div>
-      <div class="step"><div class="num">03</div><h3>Launch &amp; optimize</h3><p>Go live, watch the bookings land, and refine continuously as the system learns.</p></div>
+    <div class="grid-rule reveal" aria-hidden="true"></div>
+    <span class="sec-eyebrow reveal">How it works</span>
+    <h2 class="sec-title reveal">From free audit to a system that runs itself.</h2>
+    <p class="sec-lead reveal">A glowing AI pipeline — four steps from mapping where leads slip away to a system that captures, books, and improves on its own.</p>
+    <div class="pipeline">
+      <div class="pipe-line" aria-hidden="true"></div>
+      <div class="steps">
+        <div class="step reveal">
+          <span class="node-dot" aria-hidden="true"></span>
+          <div class="num">01</div>
+          <div class="s-ic"><i data-lucide="search-check" class="icon"></i></div>
+          <h3>Audit your business</h3>
+          <p>We map where leads slip away and pinpoint the highest-leverage automations for your business.</p>
+        </div>
+        <div class="step reveal">
+          <span class="node-dot" aria-hidden="true"></span>
+          <div class="num">02</div>
+          <div class="s-ic"><i data-lucide="route" class="icon"></i></div>
+          <h3>Map your lead &amp; booking journey</h3>
+          <p>We chart every touchpoint — DM, form, call, and follow-up — so nothing falls through the cracks.</p>
+        </div>
+        <div class="step reveal">
+          <span class="node-dot" aria-hidden="true"></span>
+          <div class="num">03</div>
+          <div class="s-ic"><i data-lucide="cpu" class="icon"></i></div>
+          <h3>Build your AI systems</h3>
+          <p>I design and wire your AI website, chatbot, voice agent, or automation — tailored to your brand.</p>
+        </div>
+        <div class="step reveal">
+          <span class="node-dot" aria-hidden="true"></span>
+          <div class="num">04</div>
+          <div class="s-ic"><i data-lucide="rocket" class="icon"></i></div>
+          <h3>Launch, test &amp; improve</h3>
+          <p>Go live, watch the bookings land, and refine continuously as the system learns.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ░░ WORK / CASE STUDIES ░░ -->
+<!-- ░░ FEATURED SYSTEMS / WORK ░░ -->
 <section class="block" id="work">
   <div class="wrap">
-    <span class="sec-eyebrow">Work · case studies</span>
-    <h2 class="sec-title">AI systems already turning attention into bookings.</h2>
-    <p class="sec-lead">A look at three systems I've built — each running quietly in the background, capturing leads and filling calendars around the clock.</p>
+    <div class="grid-rule reveal" aria-hidden="true"></div>
+    <span class="sec-eyebrow reveal">Featured systems · what I build</span>
+    <h2 class="sec-title reveal">AI systems already turning attention into bookings.</h2>
+    <p class="sec-lead reveal">A look at the systems I build — each running quietly in the background, capturing leads and filling calendars around the clock.</p>
     <div class="work-grid">
 
-      <!-- AI Booking System -->
-      <article class="case">
+      <!-- AI Website + Chatbot -->
+      <article class="case reveal">
+        <div class="case-preview">
+          <div class="dash-head">
+            <span class="dash-tag"><i class="c-ico violet"><i data-lucide="message-circle" class="icon"></i></i>Website + Chatbot</span>
+            <span class="dash-live"><span class="lvdot"></span>ONLINE</span>
+          </div>
+          <div class="mini-chat">
+            <span class="bub in">Do you have any openings this week?</span>
+            <span class="bub out">Yes — Friday 2:30 PM is free. Want me to book it?</span>
+            <span class="bub typing"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+        <div class="case-body">
+          <h3>AI Website + Chatbot</h3>
+          <p>A cinematic site with an on-brand assistant that answers instantly, qualifies every visitor, and hands warm leads straight to the booking flow.</p>
+          <div class="case-result">
+            <span class="rv">3s</span><span class="rl">avg reply time</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Instagram / WhatsApp Lead Automation -->
+      <article class="case reveal">
+        <div class="case-preview">
+          <div class="dash-head">
+            <span class="dash-tag"><i class="c-ico cyan"><i data-lucide="workflow" class="icon"></i></i>Lead Automation</span>
+            <span class="dash-live"><span class="lvdot"></span>RUNNING</span>
+          </div>
+          <div class="mini-funnel">
+            <div class="fnl">Captured<span class="track"><span class="fill" style="width:100%"></span></span><span class="val">420</span></div>
+            <div class="fnl">Qualified<span class="track"><span class="fill" style="width:74%"></span></span><span class="val">312</span></div>
+            <div class="fnl">Booked<span class="track"><span class="fill" style="width:46%"></span></span><span class="val">193</span></div>
+          </div>
+        </div>
+        <div class="case-body">
+          <h3>Instagram / WhatsApp Lead Automation</h3>
+          <p>Every lead captured, scored, and followed up automatically across DMs, forms, and ads — nurtured without lifting a finger.</p>
+          <div class="case-result">
+            <span class="rv">+38%</span><span class="rl">leads converted</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- AI Voice Agent -->
+      <article class="case reveal">
+        <div class="case-preview">
+          <div class="dash-head">
+            <span class="dash-tag"><i class="c-ico cyan"><i data-lucide="mic" class="icon"></i></i>Voice Agent</span>
+            <span class="dash-live"><span class="lvdot"></span>ON CALL</span>
+          </div>
+          <div class="mini-wave" id="caseWave"></div>
+          <div class="mini-caption"><span>Inbound call · booking</span><span class="dur">00:42</span></div>
+        </div>
+        <div class="case-body">
+          <h3>AI Voice Agent</h3>
+          <p>Natural-sounding AI that picks up every call, answers questions, and books straight into the calendar — no missed rings, day or night.</p>
+          <div class="case-result">
+            <span class="rv">100%</span><span class="rl">calls answered</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Reels / Content Workflow -->
+      <article class="case reveal">
+        <div class="case-preview">
+          <div class="dash-head">
+            <span class="dash-tag"><i class="c-ico violet"><i data-lucide="clapperboard" class="icon"></i></i>Content Workflow</span>
+            <span class="dash-live"><span class="lvdot"></span>SCHEDULED</span>
+          </div>
+          <div class="mini-reels">
+            <div class="reel-frame"><span class="play"><i data-lucide="play" class="icon"></i></span><span class="barline"><i></i></span></div>
+            <div class="reel-frame"><span class="play"><i data-lucide="play" class="icon"></i></span><span class="barline"><i></i></span></div>
+            <div class="reel-frame"><span class="play"><i data-lucide="play" class="icon"></i></span><span class="barline"><i></i></span></div>
+          </div>
+        </div>
+        <div class="case-body">
+          <h3>Reels / Content Workflow</h3>
+          <p>An always-on system that scripts, generates, and schedules short-form video — so your brand stays in the feed without the daily grind.</p>
+          <div class="case-result">
+            <span class="rv">5×</span><span class="rl">content output</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Booking Automation -->
+      <article class="case reveal">
         <div class="case-preview">
           <div class="dash-head">
             <span class="dash-tag"><i class="c-ico blue"><i data-lucide="calendar-days" class="icon"></i></i>Booking</span>
@@ -560,54 +814,10 @@
           </div>
         </div>
         <div class="case-body">
-          <h3>AI Booking System</h3>
+          <h3>Booking Automation</h3>
           <p>An AI agent that books, confirms, reminds, and reschedules straight into the calendar — no back-and-forth, no missed slots, 24/7.</p>
           <div class="case-result">
             <span class="rv">+62%</span><span class="rl">booked appointments</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- Website Chatbot System -->
-      <article class="case">
-        <div class="case-preview">
-          <div class="dash-head">
-            <span class="dash-tag"><i class="c-ico violet"><i data-lucide="message-circle" class="icon"></i></i>Chatbot</span>
-            <span class="dash-live"><span class="lvdot"></span>ONLINE</span>
-          </div>
-          <div class="mini-chat">
-            <span class="bub in">Do you have any openings this week?</span>
-            <span class="bub out">Yes — Friday 2:30 PM is free. Want me to book it?</span>
-            <span class="bub typing"><span></span><span></span><span></span></span>
-          </div>
-        </div>
-        <div class="case-body">
-          <h3>Website Chatbot System</h3>
-          <p>An on-brand assistant that answers instantly, qualifies every visitor, and hands warm leads straight to the booking flow.</p>
-          <div class="case-result">
-            <span class="rv">3s</span><span class="rl">avg reply time</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- Lead Automation System -->
-      <article class="case">
-        <div class="case-preview">
-          <div class="dash-head">
-            <span class="dash-tag"><i class="c-ico cyan"><i data-lucide="workflow" class="icon"></i></i>Leads</span>
-            <span class="dash-live"><span class="lvdot"></span>RUNNING</span>
-          </div>
-          <div class="mini-funnel">
-            <div class="fnl">Captured<span class="track"><span class="fill" style="width:100%"></span></span><span class="val">420</span></div>
-            <div class="fnl">Qualified<span class="track"><span class="fill" style="width:74%"></span></span><span class="val">312</span></div>
-            <div class="fnl">Booked<span class="track"><span class="fill" style="width:46%"></span></span><span class="val">193</span></div>
-          </div>
-        </div>
-        <div class="case-body">
-          <h3>Lead Automation System</h3>
-          <p>Every lead captured, scored, and followed up automatically across DMs, forms, and ads — nurtured without lifting a finger.</p>
-          <div class="case-result">
-            <span class="rv">+38%</span><span class="rl">leads converted</span>
           </div>
         </div>
       </article>
@@ -616,10 +826,45 @@
   </div>
 </section>
 
+<!-- ░░ WHY AI AUTOMATION MATTERS ░░ -->
+<section class="block why" id="why">
+  <canvas id="vortex" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="why-head">
+      <div class="grid-rule reveal" aria-hidden="true"></div>
+      <span class="sec-eyebrow reveal">Why AI automation matters</span>
+      <h2 class="sec-title reveal">Attention is expensive. Losing it is worse.</h2>
+      <p class="sec-lead reveal">Every unanswered DM, missed call, and slow reply is a booking that never happens. AI systems catch it all — instantly, consistently, around the clock — so your marketing actually turns into revenue.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <span class="wv">24/7</span>
+        <div class="wt">Never miss a lead</div>
+        <p>Instant replies to every DM, form, and call — even at 2 AM, even when you're fully booked.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="wv">3s</span>
+        <div class="wt">Answer at the speed of attention</div>
+        <p>Leads convert when they're hot. AI responds in seconds, not hours — before they scroll on.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="wv">+62%</span>
+        <div class="wt">Book while you sleep</div>
+        <p>Automated calendars confirm, remind, and reschedule — filling slots without the back-and-forth.</p>
+      </div>
+      <div class="why-card reveal">
+        <span class="wv">5×</span>
+        <div class="wt">Scale without hiring</div>
+        <p>Systems, not staff. One AI stack handles the volume of a full front-desk team — and never burns out.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ░░ FINAL CTA ░░ -->
 <section class="block" id="book">
   <div class="wrap">
-    <div class="cta-card">
+    <div class="cta-card reveal">
       <h2>Let's turn your attention into booked clients.</h2>
       <p>Book a free AI audit and I'll show you exactly where automation will move the needle.</p>
 
@@ -672,6 +917,9 @@
     el.setAttribute('focusable', 'false');
   });
 
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
   // booking form — client-side validation + confirmation
   const bookForm = document.getElementById('bookForm');
   const formStatus = document.getElementById('formStatus');
@@ -691,17 +939,30 @@
     });
   }
 
-  // build waveform bars
+  // build waveform bars (hero voice card)
   const wave = document.getElementById('wave');
   if (wave) {
     const hs = [40,70,52,90,60,100,46,76,58,84,50,68,44,80,56];
     hs.forEach((h,i) => { const s = document.createElement('span'); s.style.height = h+'%'; s.style.animationDelay = (-i*0.08)+'s'; wave.appendChild(s); });
   }
 
-  // subtle mouse parallax on the 3D stage
+  // build taller waveform bars for the featured voice-agent card
+  const caseWave = document.getElementById('caseWave');
+  if (caseWave) {
+    const n = 26;
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('span');
+      const h = 24 + Math.round(Math.abs(Math.sin(i * 0.7)) * 70);
+      s.style.height = h + '%';
+      s.style.animationDelay = (-i * 0.06) + 's';
+      caseWave.appendChild(s);
+    }
+  }
+
+  // subtle mouse parallax on the 3D hero stage
   const scene = document.getElementById('scene');
   const stage = document.getElementById('stage');
-  if (scene && stage && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (scene && stage && !reduceMotion) {
     let tx = -18, ty = 8, cx = -18, cy = 8;
     scene.addEventListener('mousemove', (e) => {
       const r = scene.getBoundingClientRect();
@@ -712,6 +973,192 @@
     scene.addEventListener('mouseleave', () => { tx = -18; ty = 8; });
     (function loop(){ cx += (tx-cx)*0.06; cy += (ty-cy)*0.06; stage.style.transform = `rotateX(${cy}deg) rotateY(${cx}deg)`; requestAnimationFrame(loop); })();
   }
+
+  // scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  if (reveals.length) {
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      reveals.forEach((el) => el.classList.add('in'));
+    } else {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            // stagger siblings within the same grid for a cascade feel
+            const sibs = Array.from(el.parentElement.children).filter((c) => c.classList.contains('reveal'));
+            const idx = sibs.indexOf(el);
+            el.style.transitionDelay = Math.max(0, idx) * 70 + 'ms';
+            el.classList.add('in');
+            io.unobserve(el);
+          }
+        });
+      }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+      reveals.forEach((el) => io.observe(el));
+    }
+  }
+
+  // mouse-follow glow + card tilt / spotlight (fine pointers only)
+  if (finePointer && !reduceMotion) {
+    const glow = document.getElementById('cursorGlow');
+    let gx = innerWidth / 2, gy = innerHeight / 2, cgx = gx, cgy = gy, glowOn = false;
+    window.addEventListener('pointermove', (e) => {
+      gx = e.clientX; gy = e.clientY;
+      if (!glowOn) { glow.style.opacity = '1'; glowOn = true; }
+    }, { passive: true });
+    (function glowLoop(){ cgx += (gx-cgx)*0.12; cgy += (gy-cgy)*0.12; glow.style.transform = `translate(${cgx}px, ${cgy}px)`; requestAnimationFrame(glowLoop); })();
+
+    // subtle 3D tilt + spotlight on service cards
+    document.querySelectorAll('.tilt').forEach((card) => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width;
+        const py = (e.clientY - r.top) / r.height;
+        card.style.transform = `translateY(-4px) perspective(800px) rotateX(${(0.5 - py) * 6}deg) rotateY(${(px - 0.5) * 6}deg)`;
+        card.style.setProperty('--mx', (px * 100) + '%');
+        card.style.setProperty('--my', (py * 100) + '%');
+      });
+      card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+    });
+  }
+
+  // ── Starfield / drifting particle background ──────────
+  (function starfield(){
+    const canvas = document.getElementById('stars');
+    if (!canvas || reduceMotion) return;
+    const ctx = canvas.getContext('2d');
+    const palette = ['#5ff0ff', '#6f9bff', '#a98bff', '#ff8fc0', '#ffffff'];
+    let w, h, dpr, stars, running = true, raf;
+
+    function size() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = canvas.width = Math.floor(innerWidth * dpr);
+      h = canvas.height = Math.floor(innerHeight * dpr);
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
+    }
+    function build() {
+      const count = innerWidth < 720 ? 55 : (innerWidth < 1200 ? 90 : 130);
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        const glowy = Math.random() < 0.16;
+        stars.push({
+          x: Math.random() * w, y: Math.random() * h,
+          r: (glowy ? 1.6 + Math.random() * 1.8 : 0.5 + Math.random() * 1) * dpr,
+          vy: (0.06 + Math.random() * 0.22) * dpr,
+          vx: (Math.random() - 0.5) * 0.12 * dpr,
+          a: 0.25 + Math.random() * 0.6,
+          tw: Math.random() * Math.PI * 2,
+          tws: 0.008 + Math.random() * 0.02,
+          glowy,
+          c: glowy ? palette[(Math.random() * (palette.length - 1)) | 0] : '#ffffff'
+        });
+      }
+    }
+    function frame() {
+      if (!running) return;
+      ctx.clearRect(0, 0, w, h);
+      for (const s of stars) {
+        s.y -= s.vy; s.x += s.vx; s.tw += s.tws;
+        if (s.y < -6) { s.y = h + 6; s.x = Math.random() * w; }
+        if (s.x < -6) s.x = w + 6; else if (s.x > w + 6) s.x = -6;
+        const tw = 0.6 + Math.sin(s.tw) * 0.4;
+        ctx.beginPath();
+        if (s.glowy) {
+          ctx.shadowBlur = 12 * dpr; ctx.shadowColor = s.c;
+          ctx.fillStyle = s.c; ctx.globalAlpha = s.a * tw;
+        } else {
+          ctx.shadowBlur = 0; ctx.fillStyle = s.c; ctx.globalAlpha = s.a * tw * 0.8;
+        }
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+      raf = requestAnimationFrame(frame);
+    }
+    let rt;
+    function onResize(){ clearTimeout(rt); rt = setTimeout(() => { size(); build(); }, 200); }
+    size(); build(); frame();
+    window.addEventListener('resize', onResize);
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running) { raf = requestAnimationFrame(frame); } else { cancelAnimationFrame(raf); }
+    });
+  })();
+
+  // ── Vortex / black-hole particle field (Why section) ──
+  (function vortex(){
+    const canvas = document.getElementById('vortex');
+    if (!canvas || reduceMotion) return;
+    const ctx = canvas.getContext('2d');
+    const palette = ['#5ff0ff', '#6f9bff', '#a98bff', '#ff5d9e'];
+    let w, h, dpr, cx, cy, parts, running = false, started = false, raf, maxR;
+
+    function size() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      w = canvas.width = Math.floor(rect.width * dpr);
+      h = canvas.height = Math.floor(rect.height * dpr);
+      cx = w / 2; cy = h / 2;
+      maxR = Math.hypot(w, h) / 2;
+    }
+    function spawn() {
+      const ang = Math.random() * Math.PI * 2;
+      const rad = (0.55 + Math.random() * 0.6) * maxR;
+      return {
+        ang, rad,
+        spin: (0.006 + Math.random() * 0.01) * (Math.random() < 0.5 ? 1 : 1),
+        pull: 0.0016 + Math.random() * 0.0034,
+        r: (0.5 + Math.random() * 1.6) * dpr,
+        c: palette[(Math.random() * palette.length) | 0],
+        a: 0.3 + Math.random() * 0.6
+      };
+    }
+    function build() {
+      const count = innerWidth < 720 ? 90 : (innerWidth < 1200 ? 150 : 210);
+      parts = []; for (let i = 0; i < count; i++) parts.push(spawn());
+    }
+    function frame() {
+      if (!running) return;
+      ctx.clearRect(0, 0, w, h);
+      // faint accretion halo at the core
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.5);
+      g.addColorStop(0, 'rgba(130,87,255,0.16)');
+      g.addColorStop(0.5, 'rgba(61,107,255,0.06)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, maxR * 0.5, 0, Math.PI * 2); ctx.fill();
+
+      for (const p of parts) {
+        const prevX = cx + Math.cos(p.ang) * p.rad;
+        const prevY = cy + Math.sin(p.ang) * p.rad;
+        p.ang += p.spin * (1 + (maxR - p.rad) / maxR);
+        p.rad -= p.pull * maxR * 0.02 + p.rad * 0.006;
+        if (p.rad < maxR * 0.05) Object.assign(p, spawn());
+        const x = cx + Math.cos(p.ang) * p.rad;
+        const y = cy + Math.sin(p.ang) * p.rad;
+        const fade = Math.min(1, p.rad / (maxR * 0.5));
+        ctx.strokeStyle = p.c;
+        ctx.globalAlpha = p.a * (0.35 + 0.65 * (1 - fade));
+        ctx.lineWidth = p.r;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(prevX, prevY); ctx.lineTo(x, y); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    function start(){ if (running) return; if (!started){ size(); build(); started = true; } running = true; raf = requestAnimationFrame(frame); }
+    function stop(){ running = false; cancelAnimationFrame(raf); }
+
+    let rt;
+    window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (started){ size(); build(); } }, 200); });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) start(); else stop(); });
+      }, { threshold: 0.05 });
+      io.observe(canvas);
+    } else { start(); }
+  })();
 </script>
 
 <!-- ░░ ELEVENLABS VOICE & CHAT WIDGET ░░ -->

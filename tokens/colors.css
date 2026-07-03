@@ -26,11 +26,15 @@
   --violet-600: #6a3fe6;
   --cyan-400: #5ff0ff;
   --cyan-500: #2ad8ee;  /* subtle cyan — tertiary glow */
+  --pink-400: #ff8fc0;
+  --pink-500: #ff5d9e;  /* soft neon pink — accent glow */
 
   /* ░░ Signature gradient ░░ */
   --grad-core: radial-gradient(circle at 50% 40%, var(--cyan-400) 0%, var(--blue-500) 38%, var(--violet-600) 78%, transparent 100%);
   --grad-stroke: linear-gradient(135deg, var(--cyan-400), var(--blue-500) 45%, var(--violet-500));
   --grad-text: linear-gradient(100deg, #ffffff 0%, #cdd6ff 40%, var(--blue-400) 100%);
+  --grad-beam: linear-gradient(90deg, transparent, var(--cyan-400), var(--blue-500), var(--violet-500), var(--pink-500), transparent);
+  --grad-aurora: linear-gradient(120deg, var(--cyan-500), var(--blue-500) 35%, var(--violet-500) 65%, var(--pink-500));
 
   /* ░░ Semantic ░░ */
   --success: #34e3a4;
