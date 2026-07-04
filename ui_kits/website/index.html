@@ -305,6 +305,11 @@
   .card-leads  { bottom: 52px; right: 6px; width: 220px; transform: translateZ(48px) rotateY(-13deg) rotateX(3deg); --float-dur: 8s; animation-delay: -0.6s; }
   .card-cal    { top: 150px; right: 150px; width: 182px; transform: translateZ(-36px) rotateY(-6deg); opacity: 0.9; --float-dur: 10s; animation-delay: -4s; }
   .card-reel   { top: 250px; left: 116px; width: 150px; transform: translateZ(-78px) rotateY(13deg) scale(0.92); opacity: 0.78; --float-dur: 11s; animation-delay: -5s; }
+  /* extra depth panels — further back, fainter, for a denser 3D scene */
+  .card-depth  { opacity: 0.62; }
+  .card-status { top: 120px; left: 300px; width: 168px; transform: translateZ(-150px) rotateY(7deg) scale(0.82); --float-dur: 12.5s; animation-delay: -2.5s; }
+  .card-sync   { bottom: 210px; right: 26px; width: 168px; transform: translateZ(-160px) rotateY(-10deg) scale(0.8); --float-dur: 13.5s; animation-delay: -6.5s; }
+  .card-flows  { top: 360px; left: 176px; width: 180px; transform: translateZ(-130px) rotateY(9deg) scale(0.82); --float-dur: 11.5s; animation-delay: -3.6s; }
 
   /* ── Section shell ──────────────────────────────────── */
   section.block { position: relative; z-index: 1; padding-block: var(--section-y); }
@@ -544,6 +549,7 @@
     .stage { transform: rotateX(6deg) rotateY(-10deg) scale(0.84); }
     .nav-links { display: none; }
     h1.headline { max-width: 100%; }
+    .card-depth { display: none; }
   }
   @media (max-width: 680px) {
     .svc-grid, .steps, .why-grid, .work-grid { grid-template-columns: 1fr; }
@@ -683,6 +689,28 @@
           <div class="c-head">
             <div class="c-ico cyan"><i data-lucide="clapperboard" class="icon"></i></div>
             <div><div class="c-title">Reel concept</div><div class="c-sub">generated</div></div>
+          </div>
+        </div>
+
+        <!-- depth panels (extra holographic UI, hidden on small screens) -->
+        <div class="card3d card-status card-depth">
+          <div class="c-head">
+            <div class="c-ico green"><i data-lucide="activity" class="icon"></i></div>
+            <div><div class="c-title">System online</div><div class="c-sub">99.9% uptime</div></div>
+          </div>
+        </div>
+
+        <div class="card3d card-sync card-depth">
+          <div class="c-head">
+            <div class="c-ico blue"><i data-lucide="refresh-cw" class="icon"></i></div>
+            <div><div class="c-title">AI models synced</div><div class="c-sub">just now</div></div>
+          </div>
+        </div>
+
+        <div class="card3d card-flows card-depth">
+          <div class="c-head">
+            <div class="c-ico violet"><i data-lucide="git-branch" class="icon"></i></div>
+            <div><div class="c-title">Automation running</div><div class="c-sub">6 workflows active</div></div>
           </div>
         </div>
       </div>

@@ -26,7 +26,7 @@ export function initHeroScene(mount) {
 
   let three;
   try {
-    three = new ThreeScene(mount, { cameraZ: 6 });
+    three = new ThreeScene(mount, { cameraZ: 6.6 });
   } catch (e) {
     console.warn('[HeroScene] WebGL init failed, using CSS fallback:', e);
     return null;
@@ -39,7 +39,7 @@ export function initHeroScene(mount) {
   three.renderer.setClearColor(0x05060e, 1);
 
   // ── backdrop (behind everything) ──────────────────────────────
-  const offsetX = isMobile ? 0 : 2.35;
+  const offsetX = isMobile ? 0 : 2.7;
   const backdrop = createBackdrop({ focusX: 0.5 + offsetX / 40, darkLeft: !isMobile });
   three.scene.add(backdrop.object3d);
   three.updaters.push(backdrop);
@@ -47,19 +47,27 @@ export function initHeroScene(mount) {
   // ── content group (offset toward the right on desktop) ────────
   const root = new THREE.Group();
   root.position.x = offsetX;
-  if (isMobile) root.scale.setScalar(0.82);
+  if (isMobile) root.scale.setScalar(0.8);
   three.scene.add(root);
 
   three.updaters.push(createMotionBackground(three.scene, {}));
 
   const addToRoot = (comp) => { root.add(comp.object3d); three.updaters.push(comp); return comp; };
-  addToRoot(createHeroAIOrb({ detail: isMobile ? 4 : 5 }));
+
+  // big, dominant energy core
+  addToRoot(createHeroAIOrb({ detail: isMobile ? 3 : 5, radius: isMobile ? 1.3 : 1.65 }));
   addToRoot(createOrbitalRings({}));
-  addToRoot(createVortexField({ count: isMobile ? 380 : 900 }));
+
+  // layered particle vortex — outer swirl + faster inner disc, differently
+  // tilted so the black-hole inflow reads with depth
+  addToRoot(createVortexField({ count: isMobile ? 360 : 820, inner: 1.9, outer: 5.6, tilt: 1.15, roll: -0.25 }));
+  addToRoot(createVortexField({ count: isMobile ? 180 : 460, inner: 1.7, outer: 3.6, tilt: 0.72, roll: 0.4, size: isMobile ? 0.045 : 0.038 }));
+
+  // distant ambient depth field
   addToRoot(createParticleField({
-    count: isMobile ? 300 : 800,
+    count: isMobile ? 260 : 720,
     size: isMobile ? 0.05 : 0.045,
-    inner: 2.6, outer: 9,
+    inner: 3.4, outer: 11,
   }));
 
   root.rotation.x = 0.1;

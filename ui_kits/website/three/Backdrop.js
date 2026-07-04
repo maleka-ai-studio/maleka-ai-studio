@@ -14,16 +14,16 @@ function gradientTexture(focusX = 0.56, darkLeft = true) {
   c.width = w; c.height = h;
   const ctx = c.getContext('2d');
 
-  // deep base
-  ctx.fillStyle = '#05060e';
+  // near-black base for deep contrast
+  ctx.fillStyle = '#03040a';
   ctx.fillRect(0, 0, w, h);
 
   // lit halo around the orb focus
   const fx = focusX * w, fy = 0.5 * h;
-  const glow = ctx.createRadialGradient(fx, fy, 0, fx, fy, w * 0.6);
-  glow.addColorStop(0, 'rgba(46,72,170,0.42)');
-  glow.addColorStop(0.35, 'rgba(36,46,135,0.22)');
-  glow.addColorStop(0.7, 'rgba(18,18,54,0.08)');
+  const glow = ctx.createRadialGradient(fx, fy, 0, fx, fy, w * 0.55);
+  glow.addColorStop(0, 'rgba(44,70,168,0.40)');
+  glow.addColorStop(0.35, 'rgba(32,42,128,0.20)');
+  glow.addColorStop(0.7, 'rgba(15,16,50,0.06)');
   glow.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, w, h);
@@ -51,13 +51,21 @@ function gradientTexture(focusX = 0.56, darkLeft = true) {
   }
 
   // faint holographic grid
-  ctx.strokeStyle = 'rgba(90,130,220,0.06)';
+  ctx.strokeStyle = 'rgba(90,130,220,0.05)';
   ctx.lineWidth = 1;
   const step = w / 22;
   ctx.beginPath();
   for (let x = 0; x <= w; x += step) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
   for (let y = 0; y <= h; y += step) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
   ctx.stroke();
+
+  // strong vignette — pull the edges to near-black for deep contrast
+  const vig = ctx.createRadialGradient(fx, fy, w * 0.25, fx, fy, w * 0.72);
+  vig.addColorStop(0, 'rgba(3,4,10,0)');
+  vig.addColorStop(0.7, 'rgba(2,3,8,0.35)');
+  vig.addColorStop(1, 'rgba(1,2,6,0.92)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, w, h);
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -81,10 +89,12 @@ export function createBackdrop(opts = {}) {
   // soft nebula clouds for colored depth
   const nebTex = radialGlow();
   const nebDefs = [
-    { c: 0x3d6bff, p: [3.2, 1.0, -7], s: 16, o: 0.30 },
-    { c: 0x8257ff, p: [5.0, 2.4, -8], s: 13, o: 0.26 },
+    { c: 0x3d6bff, p: [3.2, 1.0, -7],  s: 16, o: 0.30 },
+    { c: 0x8257ff, p: [5.0, 2.4, -8],  s: 13, o: 0.26 },
     { c: 0x2ad8ee, p: [2.0, -2.4, -7], s: 11, o: 0.18 },
-    { c: 0xff5d9e, p: [6.2, -1.6, -9], s: 9,  o: 0.14 },
+    { c: 0xff5d9e, p: [6.2, -1.6, -9], s: 9,  o: 0.16 },
+    { c: 0x1b2f8a, p: [1.0, 2.6, -10], s: 20, o: 0.22 }, // distant blue haze
+    { c: 0x5a2fb0, p: [7.0, 0.4, -11], s: 18, o: 0.16 }, // distant violet haze
   ];
   const nebulae = nebDefs.map((d) => {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({

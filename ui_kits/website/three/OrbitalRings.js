@@ -13,10 +13,12 @@ export function createOrbitalRings(opts = {}) {
   const nodeTex = softCircle();
 
   const defs = [
-    { r: 1.8,  tube: 0.020, color: 0x5ff0ff, op: 0.90, tiltX: 1.45, tiltY: 0.0,  spin: 0.55, nodes: 2 },
-    { r: 2.35, tube: 0.016, color: 0x3d6bff, op: 0.80, tiltX: 1.25, tiltY: 0.35, spin: -0.38, nodes: 2 },
-    { r: 2.95, tube: 0.013, color: 0x8257ff, op: 0.62, tiltX: 1.65, tiltY: -0.2, spin: 0.27, nodes: 1 },
-    { r: 3.65, tube: 0.010, color: 0xff5d9e, op: 0.45, tiltX: 1.9,  tiltY: 0.25, spin: -0.19, nodes: 1 },
+    { r: 2.15, tube: 0.024, color: 0x5ff0ff, op: 0.95, tiltX: 1.45, tiltY: 0.0,  spin: 0.55, nodes: 2 },
+    { r: 2.55, tube: 0.018, color: 0x3d6bff, op: 0.85, tiltX: 1.25, tiltY: 0.35, spin: -0.40, nodes: 2 },
+    { r: 3.05, tube: 0.016, color: 0x8257ff, op: 0.70, tiltX: 1.65, tiltY: -0.2, spin: 0.30, nodes: 1 },
+    { r: 3.6,  tube: 0.013, color: 0x2ad8ee, op: 0.58, tiltX: 1.05, tiltY: 0.5,  spin: -0.24, nodes: 2 },
+    { r: 4.2,  tube: 0.011, color: 0xff5d9e, op: 0.44, tiltX: 1.9,  tiltY: 0.25, spin: -0.18, nodes: 1 },
+    { r: 4.95, tube: 0.008, color: 0x6f9bff, op: 0.30, tiltX: 1.5,  tiltY: -0.4, spin: 0.13, nodes: 1 },
   ];
 
   const rings = defs.map((d) => {
