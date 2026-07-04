@@ -16,7 +16,8 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "https://unpkg.com/three@0.160.1/build/three.module.js"
+    "three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
   }
 }
 </script>
@@ -182,16 +183,31 @@
   }
   .layer { position: absolute; transform-style: preserve-3d; }
 
-  /* WebGL hero layer — sits behind the floating cards; only visible once
-     the Three.js scene initialises. Pointer-transparent so cards + the
-     existing stage parallax keep working. */
-  .webgl-hero { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 900ms var(--ease-out); }
-  .webgl-hero canvas { display: block; width: 100%; height: 100%; }
+  /* Full-hero WebGL layer — a dramatic cinematic backdrop that spans the
+     whole hero, sitting behind the copy (.wrap, z1) and floating cards
+     (.stage, z2). Opaque canvas, masked to fade seamlessly into the page
+     below. Only revealed once the Three.js scene initialises; otherwise
+     the CSS orb remains the fallback. */
+  .hero-3d {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 1000ms var(--ease-out);
+    -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  }
+  .hero-3d canvas { display: block; width: 100%; height: 100%; }
   .scene .stage { z-index: 2; }
-  /* when WebGL is live, hand the orb over to it and hide the CSS core
-     (the floating cards stay); the CSS core remains the fallback otherwise */
-  .scene.webgl-on .webgl-hero { opacity: 1; }
-  .scene.webgl-on .layer.core { opacity: 0; visibility: hidden; }
+  .hero.hero3d-on .hero-3d { opacity: 1; }
+  .hero.hero3d-on .layer.core { opacity: 0; visibility: hidden; }
+  /* legibility scrim over the WebGL backdrop, behind the copy (left→right
+     fade). Only present when the 3D scene is active. */
+  .hero.hero3d-on::after {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(90deg, rgba(5,6,14,0.88) 0%, rgba(5,6,14,0.55) 26%, rgba(5,6,14,0.12) 46%, transparent 60%);
+  }
+  @media (max-width: 980px) {
+    /* stacked layout: darken the top where the copy sits */
+    .hero.hero3d-on::after { background: linear-gradient(180deg, rgba(5,6,14,0.8) 0%, rgba(5,6,14,0.3) 34%, transparent 60%); }
+  }
 
   /* core */
   .core { top: 46%; left: 50%; width: 0; height: 0; transform: translate(-50%,-50%); }
@@ -236,20 +252,28 @@
   /* floating cards */
   .card3d {
     position: absolute;
-    background: linear-gradient(158deg, rgba(36,42,70,0.86), rgba(14,18,32,0.82));
+    background: linear-gradient(158deg, rgba(40,48,82,0.82), rgba(12,16,30,0.78));
     border: 1px solid var(--line-2);
     border-radius: var(--r-md);
-    box-shadow: var(--shadow-float), var(--sheen-top);
-    padding: 13px 15px; color: var(--fg-1);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    box-shadow: var(--shadow-float), var(--sheen-top), 0 0 0 1px rgba(125,156,255,0.06);
+    padding: 13px 15px; color: var(--fg-1); overflow: hidden;
+    backdrop-filter: blur(12px) saturate(1.35); -webkit-backdrop-filter: blur(12px) saturate(1.35);
     animation: float var(--float-dur, 7s) var(--ease-soft) infinite;
   }
+  /* neon edge */
   .card3d::before {
     content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
     background: var(--grad-stroke);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor; mask-composite: exclude;
-    opacity: 0.5; pointer-events: none;
+    opacity: 0.72; pointer-events: none;
+  }
+  /* sweeping holographic sheen */
+  .card3d::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(115deg, transparent 30%, rgba(140,190,255,0.12) 47%, rgba(180,140,255,0.07) 53%, transparent 70%);
+    background-size: 220% 220%; mix-blend-mode: screen; opacity: 0.85;
+    animation: holoSheen 8.5s var(--ease-soft) infinite;
   }
   .c-head { display: flex; align-items: center; gap: 9px; }
   .c-ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
@@ -488,6 +512,7 @@
   @keyframes pipeRun { 0% { left: -22%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
   @keyframes nodePing { 0% { opacity: 0.9; transform: scale(1); } 70%,100% { opacity: 0; transform: scale(1.8); } }
   @keyframes reelPlay { 0% { left: -40%; } 100% { left: 100%; } }
+  @keyframes holoSheen { 0% { background-position: 0% 0%; } 100% { background-position: 200% 200%; } }
 
   /* keep ring spin animating around their own tilt */
   .ring.r1 { animation-name: spinr1; } @keyframes spinr1 { to { transform: translate(-50%,-50%) rotateX(70deg) rotateZ(360deg); } }
@@ -497,7 +522,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .card3d, .core-halo, .core-core, .core-rays, .ring, .wave span, .mini-wave span, .eyebrow .dot,
+    .card3d, .card3d::after, .core-halo, .core-core, .core-rays, .ring, .wave span, .mini-wave span, .eyebrow .dot,
     .beams span, .brand-mark, h1.headline .glow, .grid-rule::after, .pipe-line::after,
     .step .node-dot::after, .reel-frame .barline i, .cta-card::before, .dash-live .lvdot {
       animation: none !important;
@@ -556,6 +581,9 @@
 
 <!-- ░░ HERO ░░ -->
 <section class="hero">
+  <!-- Full-hero cinematic WebGL backdrop (Three.js). Mounts here; the CSS
+       orb inside .scene below is the fallback when WebGL is unavailable. -->
+  <div class="hero-3d" id="heroCanvas3d" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <!-- left copy -->
     <div class="hero-copy">
@@ -577,10 +605,8 @@
       </div>
     </div>
 
-    <!-- right 3D scene -->
+    <!-- right 3D scene (CSS fallback core + floating holographic cards) -->
     <div class="scene" id="scene">
-      <!-- WebGL AI core (Three.js) mounts here; CSS core below is the fallback -->
-      <div class="webgl-hero" id="webglHero" aria-hidden="true"></div>
       <div class="stage" id="stage">
         <!-- core -->
         <div class="layer core">
@@ -1191,11 +1217,11 @@
   // when vercel.json rewrites this page to the site root ("/"). Inter-module
   // imports inside three/ are module-relative, so they resolve either way.
   import { initHeroScene } from '/ui_kits/website/three/HeroScene.js';
-  const scene = document.getElementById('scene');
-  const mount = document.getElementById('webglHero');
+  const hero = document.querySelector('.hero');
+  const mount = document.getElementById('heroCanvas3d');
   try {
     const instance = initHeroScene(mount);
-    if (instance) scene.classList.add('webgl-on');
+    if (instance) hero.classList.add('hero3d-on');
   } catch (err) {
     console.warn('[hero-3d] init skipped, using CSS fallback:', err);
   }

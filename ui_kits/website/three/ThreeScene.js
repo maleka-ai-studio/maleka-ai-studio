@@ -29,6 +29,8 @@ export class ThreeScene {
   constructor(mount, opts = {}) {
     this.mount = mount;
     this.updaters = [];
+    this.resizeHooks = [];
+    this.renderFn = null; // optional external render (e.g. bloom composer)
     this.running = false;
     this.clock = new THREE.Clock();
 
@@ -88,13 +90,23 @@ export class ThreeScene {
 
   onFrame(fn) { this.updaters.push({ update: fn }); }
 
+  // Register an external renderer (e.g. an EffectComposer) used in place of
+  // the default renderer.render() each frame.
+  setRender(fn) { this.renderFn = fn; }
+
+  // Called on resize with (width, height, pixelRatio) — used to keep the
+  // bloom composer's size in sync with the canvas.
+  onResize(fn) { this.resizeHooks.push(fn); }
+
   _resize() {
     const w = this.mount.clientWidth || 1;
     const h = this.mount.clientHeight || 1;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.dprCap));
+    const pr = Math.min(window.devicePixelRatio || 1, this.dprCap);
+    this.renderer.setPixelRatio(pr);
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    for (const fn of this.resizeHooks) fn(w, h, pr);
   }
 
   start() {
@@ -116,7 +128,8 @@ export class ThreeScene {
     const dt = Math.min(this.clock.getDelta(), 0.05);
     const t = this.clock.elapsedTime;
     for (const u of this.updaters) u.update(t, dt);
-    this.renderer.render(this.scene, this.camera);
+    if (this.renderFn) this.renderFn();
+    else this.renderer.render(this.scene, this.camera);
     this._raf = requestAnimationFrame(this._loop);
   }
 
