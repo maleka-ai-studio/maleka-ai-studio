@@ -11,6 +11,15 @@
 <meta property="og:type" content="website" />
 <link rel="stylesheet" href="../../styles.css" />
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<!-- Three.js as an ES module (pinned). Only the core build is needed;
+     the scene uses no addons. Matches the site's existing CDN pattern. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.1/build/three.module.js"
+  }
+}
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -172,6 +181,17 @@
     will-change: transform;
   }
   .layer { position: absolute; transform-style: preserve-3d; }
+
+  /* WebGL hero layer — sits behind the floating cards; only visible once
+     the Three.js scene initialises. Pointer-transparent so cards + the
+     existing stage parallax keep working. */
+  .webgl-hero { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 900ms var(--ease-out); }
+  .webgl-hero canvas { display: block; width: 100%; height: 100%; }
+  .scene .stage { z-index: 2; }
+  /* when WebGL is live, hand the orb over to it and hide the CSS core
+     (the floating cards stay); the CSS core remains the fallback otherwise */
+  .scene.webgl-on .webgl-hero { opacity: 1; }
+  .scene.webgl-on .layer.core { opacity: 0; visibility: hidden; }
 
   /* core */
   .core { top: 46%; left: 50%; width: 0; height: 0; transform: translate(-50%,-50%); }
@@ -559,6 +579,8 @@
 
     <!-- right 3D scene -->
     <div class="scene" id="scene">
+      <!-- WebGL AI core (Three.js) mounts here; CSS core below is the fallback -->
+      <div class="webgl-hero" id="webglHero" aria-hidden="true"></div>
       <div class="stage" id="stage">
         <!-- core -->
         <div class="layer core">
@@ -1159,6 +1181,24 @@
       io.observe(canvas);
     } else { start(); }
   })();
+</script>
+
+<!-- ░░ HERO 3D SCENE (Three.js, progressive enhancement) ░░ -->
+<!-- Loads as a module; on any failure the CSS orb stays as the fallback,
+     so the hero never breaks and the page has no hard dependency on WebGL. -->
+<script type="module">
+  // Absolute path so it resolves both when the file is served directly and
+  // when vercel.json rewrites this page to the site root ("/"). Inter-module
+  // imports inside three/ are module-relative, so they resolve either way.
+  import { initHeroScene } from '/ui_kits/website/three/HeroScene.js';
+  const scene = document.getElementById('scene');
+  const mount = document.getElementById('webglHero');
+  try {
+    const instance = initHeroScene(mount);
+    if (instance) scene.classList.add('webgl-on');
+  } catch (err) {
+    console.warn('[hero-3d] init skipped, using CSS fallback:', err);
+  }
 </script>
 
 <!-- ░░ ELEVENLABS VOICE & CHAT WIDGET ░░ -->
