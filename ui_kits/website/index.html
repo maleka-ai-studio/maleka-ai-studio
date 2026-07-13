@@ -559,6 +559,66 @@
     .scene { height: 440px; }
     .stage { transform: scale(0.62); }
   }
+
+  /* ── ElevenLabs concierge widget — premium dark theme ─────────────────
+     Themes the native widget through its SUPPORTED surface only: the
+     --el-* custom properties inherit through the widget's (open) shadow
+     DOM, so the panel, launcher and controls adopt the studio's look
+     without touching internal markup. Widget functionality is untouched. */
+  elevenlabs-convai {
+    /* surfaces — deep navy / black glass */
+    --el-base: #0a0e1a;
+    --el-base-hover: #121a2e;
+    --el-base-active: #16203a;
+    --el-base-subtle: #0e1526;
+    --el-base-border: rgba(120, 180, 255, 0.16);
+    --el-base-primary: #eaf2ff;
+    --el-base-error: #ff6b7d;
+    /* accent — cyan / electric blue action colour */
+    --el-accent: #22d3ee;
+    --el-accent-hover: #45dcf2;
+    --el-accent-active: #12b9d6;
+    --el-accent-primary: #04121a;
+    /* rounded, premium radii */
+    --el-sheet-radius: 22px;
+    --el-compact-sheet-radius: 20px;
+    --el-dropdown-sheet-radius: 14px;
+    --el-button-radius: 13px;
+    --el-bubble-radius: 16px;
+    --el-input-radius: 13px;
+    --el-overlay-padding: 18px;
+  }
+
+  /* Soft, non-interactive cyan/violet halo behind the corner launcher for a
+     cinematic premium feel. pointer-events:none so it NEVER intercepts the
+     real widget button. Sits just under the widget's own top layer. */
+  .mk-concierge-glow {
+    position: fixed;
+    right: 8px;
+    bottom: 8px;
+    width: 210px;
+    height: 210px;
+    pointer-events: none;
+    /* above page content (site max is 100) but behind the widget (z 1000),
+       so the halo glows from *behind* the launcher and panel. */
+    z-index: 900;
+    background:
+      radial-gradient(42% 42% at 72% 74%, rgba(34, 211, 238, 0.34), rgba(34, 211, 238, 0) 70%),
+      radial-gradient(46% 46% at 60% 62%, rgba(124, 92, 255, 0.26), rgba(124, 92, 255, 0) 72%);
+    filter: blur(6px);
+    opacity: 0.9;
+    animation: mkGlowPulse 6.5s ease-in-out infinite;
+  }
+  @keyframes mkGlowPulse {
+    0%, 100% { opacity: 0.62; transform: scale(0.98); }
+    50%      { opacity: 0.95; transform: scale(1.04); }
+  }
+  @media (max-width: 560px) {
+    .mk-concierge-glow { width: 150px; height: 150px; right: 4px; bottom: 4px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mk-concierge-glow { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -1255,10 +1315,25 @@
   }
 </script>
 
-<!-- ░░ ELEVENLABS VOICE & CHAT WIDGET ░░ -->
+<!-- ░░ MALEKA AI CONCIERGE — ELEVENLABS VOICE & CHAT WIDGET ░░ -->
 <!-- Floating assistant, fixed bottom-right on every page. Renders in its own
-     layer, so it does not affect the page layout or the 3D hero. -->
-<elevenlabs-convai agent-id="agent_8901kw2616bmf3t9wesxz08wajys"></elevenlabs-convai>
+     layer, so it does not affect the page layout or the 3D hero.
+     Branding/theming is applied through the widget's SUPPORTED surface only
+     (attributes + inherited --el-* CSS variables in the <style> block); the
+     agent, functionality and shadow-DOM internals are left intact. -->
+<div class="mk-concierge-glow" aria-hidden="true"></div>
+<elevenlabs-convai
+  agent-id="agent_8901kw2616bmf3t9wesxz08wajys"
+  variant="full"
+  placement="bottom-right"
+  avatar-image-url="/ui_kits/website/assets/maleka-orb.svg"
+  avatar-orb-color-1="#22d3ee"
+  avatar-orb-color-2="#7c5cff"
+  bg-color="#0a0e1a"
+  text-color="#eaf2ff"
+  border-color="#1b2740"
+  override-first-message="Hi, I'm the Maleka AI Studio assistant ✨ Tell me about your business, and I'll help you find the right AI system for more leads, bookings, and faster customer communication."
+></elevenlabs-convai>
 <script src="https://unpkg.com/@elevenlabs/convai-widget-embed@0.14.10/dist/index.js" async type="text/javascript"></script>
 </body>
 </html>
