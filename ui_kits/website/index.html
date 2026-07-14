@@ -1320,7 +1320,10 @@
      layer, so it does not affect the page layout or the 3D hero.
      Branding/theming is applied through the widget's SUPPORTED surface only
      (attributes + inherited --el-* CSS variables in the <style> block); the
-     agent, functionality and shadow-DOM internals are left intact. -->
+     agent, functionality and shadow-DOM internals are left intact.
+     NOTE: the first message is controlled in the ElevenLabs dashboard, not
+     here — the agent config disallows overriding first_message from the
+     client, so no override-first-message attribute is used. -->
 <div class="mk-concierge-glow" aria-hidden="true"></div>
 <elevenlabs-convai
   agent-id="agent_8901kw2616bmf3t9wesxz08wajys"
@@ -1332,7 +1335,6 @@
   bg-color="#0a0e1a"
   text-color="#eaf2ff"
   border-color="#1b2740"
-  override-first-message="Hi, I'm the Maleka AI Studio assistant ✨ Tell me about your business, and I'll help you find the right AI system for more leads, bookings, and faster customer communication."
 ></elevenlabs-convai>
 <script src="https://unpkg.com/@elevenlabs/convai-widget-embed@0.14.10/dist/index.js" async type="text/javascript"></script>
 </body>
