@@ -480,15 +480,22 @@
   .field-full { grid-column: 1 / -1; }
   .book-form label { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--fg-2); }
   .book-form label .opt { color: var(--fg-4); }
-  .book-form input, .book-form textarea {
+  .book-form input, .book-form textarea, .book-form select {
     font-family: var(--font-body); font-size: var(--fs-sm); color: var(--fg-1);
     background: rgba(255,255,255,0.04); border: 1px solid var(--line-2); border-radius: var(--r-sm);
     padding: 12px 14px; width: 100%; transition: border-color var(--dur), box-shadow var(--dur);
   }
   .book-form input::placeholder, .book-form textarea::placeholder { color: var(--fg-4); }
-  .book-form input:focus, .book-form textarea:focus { outline: none; border-color: var(--line-glow); box-shadow: 0 0 0 3px rgba(61,107,255,0.18); }
+  .book-form input:focus, .book-form textarea:focus, .book-form select:focus { outline: none; border-color: var(--line-glow); box-shadow: 0 0 0 3px rgba(61,107,255,0.18); }
   .book-form input:user-invalid, .book-form textarea:user-invalid { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(255,93,122,0.16); }
   .book-form textarea { resize: vertical; min-height: 84px; }
+  .book-form select {
+    appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b93ad' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+  }
+  .book-form select option { background: #0b0e1a; color: var(--fg-1); }
+  .book-form button[type="submit"][disabled] { opacity: 0.6; pointer-events: none; }
   .form-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 4px; }
   .form-status { grid-column: 1 / -1; margin: 2px 0 0; font-size: var(--fs-sm); min-height: 1.3em; text-align: center; }
   .form-status.ok { color: var(--success); }
@@ -1007,19 +1014,53 @@
       <form class="book-form" id="bookForm" novalidate>
         <div class="field">
           <label for="bf-name">Your name</label>
-          <input id="bf-name" name="name" type="text" autocomplete="name" required placeholder="Jordan Rivera" />
+          <input id="bf-name" name="fullName" type="text" autocomplete="name" required placeholder="Jordan Rivera" />
         </div>
         <div class="field">
           <label for="bf-business">Business name</label>
-          <input id="bf-business" name="business" type="text" autocomplete="organization" required placeholder="Velvet Studio" />
+          <input id="bf-business" name="businessName" type="text" autocomplete="organization" required placeholder="Velvet Studio" />
         </div>
-        <div class="field field-full">
+        <div class="field">
           <label for="bf-email">Email</label>
           <input id="bf-email" name="email" type="email" autocomplete="email" required placeholder="you@business.com" />
         </div>
+        <div class="field">
+          <label for="bf-phone">Phone / WhatsApp <span class="opt">(optional)</span></label>
+          <input id="bf-phone" name="phone" type="tel" autocomplete="tel" placeholder="+1 555 000 0000" />
+        </div>
+        <div class="field">
+          <label for="bf-type">Business type <span class="opt">(optional)</span></label>
+          <select id="bf-type" name="businessType">
+            <option value="">Select your business type</option>
+            <option>Beauty Salon</option>
+            <option>Aesthetic Clinic</option>
+            <option>Coach / Consultant</option>
+            <option>Premium Local Business</option>
+            <option>Instagram-Driven Brand</option>
+            <option>Other Service Business</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="bf-interest">Interested in <span class="opt">(optional)</span></label>
+          <select id="bf-interest" name="interest">
+            <option value="">Select a service</option>
+            <option>AI Website Design</option>
+            <option>AI Chatbot</option>
+            <option>AI Voice Agent</option>
+            <option>Lead / Booking Automation</option>
+            <option>AI Video / Reels System</option>
+            <option>WhatsApp / Instagram Lead Handling</option>
+            <option>CRM / Google Sheets Automation</option>
+            <option>Not sure yet — recommend for me</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label for="bf-link">Website or Instagram <span class="opt">(optional)</span></label>
+          <input id="bf-link" name="websiteOrInstagram" type="text" inputmode="url" placeholder="https://instagram.com/yourbrand" />
+        </div>
         <div class="field field-full">
           <label for="bf-goal">What do you want to automate? <span class="opt">(optional)</span></label>
-          <textarea id="bf-goal" name="goal" rows="3" placeholder="Bookings, DMs, follow-ups…"></textarea>
+          <textarea id="bf-goal" name="message" rows="3" placeholder="Bookings, DMs, follow-ups…"></textarea>
         </div>
         <div class="form-actions">
           <button class="btn btn-primary" type="submit">Book Free AI Audit <i data-lucide="sparkles" class="icon" aria-hidden="true"></i></button>
@@ -1056,11 +1097,14 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  // booking form — client-side validation + confirmation
+  // booking form — validation + POST to n8n lead automation
+  const LEAD_WEBHOOK_URL = 'https://n8n.basezone.dev/webhook/maleka-website-lead';
   const bookForm = document.getElementById('bookForm');
   const formStatus = document.getElementById('formStatus');
   if (bookForm) {
-    bookForm.addEventListener('submit', (e) => {
+    const submitBtn = bookForm.querySelector('button[type="submit"]');
+    const submitLabel = submitBtn.innerHTML;
+    bookForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!bookForm.checkValidity()) {
         formStatus.textContent = 'Please add your name, business, and a valid email.';
@@ -1068,10 +1112,44 @@
         bookForm.reportValidity();
         return;
       }
-      // TODO: wire to a real endpoint (Formspree, a /api route, or your CRM) before launch.
-      formStatus.textContent = "Thanks — your audit request is in. I'll be in touch within 24 hours.";
-      formStatus.className = 'form-status ok';
-      bookForm.reset();
+      const fd = new FormData(bookForm);
+      const field = (k) => String(fd.get(k) || '').trim();
+      const payload = {
+        fullName: field('fullName'),
+        email: field('email'),
+        phone: field('phone'),
+        businessName: field('businessName'),
+        businessType: field('businessType'),
+        websiteOrInstagram: field('websiteOrInstagram'),
+        interest: field('interest'),
+        message: field('message'),
+        source: 'website'
+      };
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.textContent = 'Sending…';
+      formStatus.textContent = '';
+      formStatus.className = 'form-status';
+      try {
+        const res = await fetch(LEAD_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Lead webhook responded with ' + res.status);
+        formStatus.textContent = 'Thank you — your request was received. The Maleka AI Studio team will follow up soon.';
+        formStatus.className = 'form-status ok';
+        bookForm.reset();
+      } catch (err) {
+        console.error('Lead submission failed:', err);
+        formStatus.textContent = 'Something went wrong. Please try again or contact us directly.';
+        formStatus.className = 'form-status err';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute('aria-busy');
+        submitBtn.innerHTML = submitLabel;
+        lucide.createIcons();
+      }
     });
   }
 
